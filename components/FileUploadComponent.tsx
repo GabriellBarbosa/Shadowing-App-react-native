@@ -1,6 +1,5 @@
 import React, { useCallback } from 'react';
-import { Button } from 'react-native';
-import { ThemedView } from './ThemedView';
+import { Button, View } from 'react-native';
 import * as DocumentPicker from 'expo-document-picker';
 
 export default function FileUploadComponent() {
@@ -45,8 +44,8 @@ export default function FileUploadComponent() {
     }, []);
 
     return (
-      <ThemedView>
+      <View>
         <Button title="Pick Audio" onPress={pickFileAndUpload} />
-      </ThemedView>
+      </View>
     );
   };
