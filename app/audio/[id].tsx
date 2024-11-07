@@ -4,12 +4,12 @@ import { useLocalSearchParams } from "expo-router";
 import { Audio } from 'expo-av';
 
 export default function AudioScreen() {
-    const [audios, setAudios] = React.useState<any[]>([]);
     const { id } = useLocalSearchParams();
 
-    const [recording, setRecording] = React.useState<Audio.Recording | null>(null);
-    const [recordings, setRecordings] = React.useState<Array<{ sound: Audio.Sound, file: string | null }>>([]);
-    const [recordingIndex, setRecordingIndex] = React.useState<number | null>(null);
+    const [audios, setAudios] = React.useState<any[]>([]);
+    const [recording, setRecording] = React.useState<Audio.Recording | undefined>(undefined);
+    const [recordings, setRecordings] = React.useState<Audio.Sound[]>([]);
+    const [recordingIndex, setRecordingIndex] = React.useState<number | undefined>(undefined);
 
     async function startRecording(index: number) {
         try {
@@ -24,23 +24,19 @@ export default function AudioScreen() {
                 setRecordingIndex(index);
             }
         } catch(err) {
-            setRecording(null);
-            setRecordingIndex(null);
+            setRecording(undefined);
+            setRecordingIndex(undefined);
         }
     }
     async function stopRecording() {
-        setRecording(null);
-        setRecordingIndex(null);
+        setRecording(undefined);
+        setRecordingIndex(undefined);
         
         if (recording && recordingIndex) {
             await recording.stopAndUnloadAsync();
             const allRecordings = [...recordings];
             const { sound } = await recording.createNewLoadedSoundAsync();
-            allRecordings[recordingIndex] = {
-                sound,
-                file: recording.getURI()
-            };
-
+            allRecordings[recordingIndex] = sound;
             setRecordings(allRecordings);
         }
     }
@@ -71,20 +67,22 @@ export default function AudioScreen() {
         <View style={styles.container}>
             {audios && audios.map((audio, index) => (
                 <View key={index}>
-                    <Button
-                        onPress={async () => await audio.playAsync()}
-                        title="NATIVE"
-                    />
+                    <View style={styles.nativeSpeechBtn}>
+                        <Button
+                            onPress={async () => await audio.playAsync()}
+                            title="Native"
+                        />
+                    </View>
 
                     {recordings[index] ? (
-                        <View style={styles.wideBtnWrapper}>
-                            <View style={styles.wideBtn}>
+                        <View style={styles.row}>
+                            <View style={styles.wide}>
                                 <Button 
-                                    title="YOU" 
-                                    onPress={() => recordings[index].sound.replayAsync()}
+                                    title="You" 
+                                    onPress={() => recordings[index].replayAsync()}
                                 />
                             </View>
-                            <View style={styles.wideBtn}>
+                            <View style={styles.wide}>
                                 <Button
                                     onPress={() => recording ? stopRecording() : startRecording(index)}
                                     title={recording && recordingIndex == index ? 'Stop' : 'Try Again'}
@@ -108,13 +106,15 @@ const styles = StyleSheet.create({
         padding: 10,
         gap: 20
     },
-    wideBtnWrapper: {
+    nativeSpeechBtn: {
+        marginBottom: 1
+    },
+    row: {
         display: 'flex',
         flexDirection: 'row',
-        gap: 1,
-        marginTop: 1
+        columnGap: 1,
     },
-    wideBtn: {
-        flexGrow: 1
+    wide: {
+        flex: 1
     }
 })
