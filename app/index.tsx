@@ -17,11 +17,14 @@ export default function HomeScreen() {
     <View>
       <FileUploadComponent />
       {audios.map((audioName, index) => (
-        <Link key={index} href={{
-          // @ts-ignore 
-          pathname: '/audio/[id]',
-          params: { id: audioName }
-        }}>{ audioName }</Link>
+        <Link 
+          key={index} 
+          href={{
+            // @ts-ignore 
+            pathname: '/audio/[id]',
+            params: { id: audioName }
+          }
+        }>{ audioName }</Link>
       ))}
     </View>
   );

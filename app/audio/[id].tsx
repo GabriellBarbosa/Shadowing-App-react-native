@@ -43,7 +43,7 @@ export default function AudioScreen() {
     }
 
     React.useEffect(() => {
-    fetch(`http://127.0.0.1:5000/audio/${id}`)
+        fetch(`http://127.0.0.1:5000/audio/${id}`)
         .then((res) => res.json())
         .then(async (audios) => {
             const loadedAudios = await loadAudios(audios);
@@ -98,7 +98,6 @@ export default function AudioScreen() {
             </View>
         )
     };
-      
 
     return (
         <SafeAreaProvider>
