@@ -13,7 +13,7 @@ export default function RecordAndListen(props: {
     async function startRecording() {
         try {
             const recording = await tryToStartRecording();
-            if (recording) setRecording(recording);
+            setRecording(recording);
         } catch(err) {
             setRecording(undefined);
         }
@@ -69,7 +69,7 @@ export default function RecordAndListen(props: {
             ) : (
                 <Button
                     onPress={() => recording ? stopRecording() : startRecording()}
-                    title={props.recordings[props.index] ? 'Stop' : 'Record'}
+                    title={recording ? 'Stop' : 'Record'}
                 />
             )}
         </View>

@@ -11,7 +11,7 @@ export default function AudioScreen() {
     const [recordings, setRecordings] = React.useState<Audio.Sound[]>([]);
 
     React.useEffect(() => {
-        fetch(`http://127.0.0.1:5000/audio/${id}`)
+        fetch(`http://192.168.18.6:5000/audio/${id}`)
         .then((res) => res.json())
         .then(async (audios) => {
             const loadedAudios = await loadAudios(audios);
@@ -25,7 +25,7 @@ export default function AudioScreen() {
         const result = [];
         for await (const url of audiosUrl) {
             const loaded = await Audio.Sound.createAsync({
-                uri: `http://127.0.0.1:5000/${url}`,
+                uri: `http://192.168.18.6:5000/${url}`,
             });
             result.push(loaded.sound);
         }

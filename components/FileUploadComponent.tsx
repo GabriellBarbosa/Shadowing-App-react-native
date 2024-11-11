@@ -36,7 +36,7 @@ export default function FileUploadComponent() {
       async function tryToUpload(file: File) {
         const data = new FormData();
         data.append('file', file);
-        await fetch('http://127.0.0.1:5000/upload', {
+        await fetch('http://192.168.18.6:5000/upload', {
           method: 'POST',
           body: data
         });
