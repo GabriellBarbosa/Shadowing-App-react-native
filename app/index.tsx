@@ -1,13 +1,15 @@
-import { StyleSheet, Text, View } from 'react-native';
-import FileUploadComponent from '@/components/FileUploadComponent';
 import React from 'react';
+import { StyleSheet, View } from 'react-native';
 import { Link } from 'expo-router';
+import { api } from '@/utils/constants';
+
+import FileUploadComponent from '@/components/FileUploadComponent';
 
 export default function HomeScreen() {
   const [audios, setAudios] = React.useState<string[]>([]);
 
   React.useEffect(() => {
-    fetch('http://192.168.18.6:5000/audios')
+    fetch(`${api}/audios`)
       .then((res) => res.json())
       .then((json) => setAudios(json.audios))
       .catch((err) => console.error(err));

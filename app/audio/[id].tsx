@@ -3,6 +3,8 @@ import { Button, FlatList, StyleSheet, View } from "react-native";
 import { useLocalSearchParams } from "expo-router";
 import { Audio } from 'expo-av';
 import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
+import { api } from "@/utils/constants";
+
 import RecordAndListen from "@/components/RecordAndListen";
 
 export default function AudioScreen() {
@@ -11,7 +13,7 @@ export default function AudioScreen() {
     const [recordings, setRecordings] = React.useState<Audio.Sound[]>([]);
 
     React.useEffect(() => {
-        fetch(`http://192.168.18.6:5000/audio/${id}`)
+        fetch(`${api}/audio/${id}`)
         .then((res) => res.json())
         .then(async (audios) => {
             const loadedAudios = await loadAudios(audios);
@@ -25,7 +27,7 @@ export default function AudioScreen() {
         const result = [];
         for await (const url of audiosUrl) {
             const loaded = await Audio.Sound.createAsync({
-                uri: `http://192.168.18.6:5000/${url}`,
+                uri: `${api}/${url}`,
             });
             result.push(loaded.sound);
         }
