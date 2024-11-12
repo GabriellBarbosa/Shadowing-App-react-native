@@ -32,13 +32,12 @@ export default function AudioScreen() {
         return result;
     }
 
-
     const Shadowing = (props: {audio: Audio.Sound, index: number}) => {
         return (
             <View style={styles.wrapper}>
                 <View style={styles.nativeSpeechBtn}>
                     <Button
-                        onPress={async () => await props.audio.playAsync()}
+                        onPress={async () => await playAudio(props.audio)}
                         title="Native"
                     />
                 </View>
@@ -48,6 +47,11 @@ export default function AudioScreen() {
                     setRecordings={setRecordings} />
             </View>
         )
+
+        async function playAudio(audio: Audio.Sound) {
+            await audio.setPositionAsync(0);
+            await audio.playAsync();
+        }
     };
 
     return (
@@ -66,7 +70,7 @@ export default function AudioScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        padding: 10
+        padding: 10 
     },
     wrapper: {
         marginVertical: 10

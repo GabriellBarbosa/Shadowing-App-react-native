@@ -49,6 +49,13 @@ export default function RecordAndListen(props: {
         }
     }
 
+    async function toggleRecording() {
+        if (recording)
+            await stopRecording()
+        else 
+            await startRecording()
+    }
+
     return (
         <View>
             {props.recordings[props.index] ? (
@@ -61,14 +68,14 @@ export default function RecordAndListen(props: {
                     </View>
                     <View style={styles.wide}>
                         <Button
-                            onPress={() => recording ? stopRecording() : startRecording()}
+                            onPress={async () => await toggleRecording()}
                             title={recording ? 'Stop' : 'Try Again'}
                         />
                     </View>
                 </View>
             ) : (
                 <Button
-                    onPress={() => recording ? stopRecording() : startRecording()}
+                    onPress={async () => await toggleRecording()}
                     title={recording ? 'Stop' : 'Record'}
                 />
             )}
