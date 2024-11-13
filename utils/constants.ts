@@ -1,9 +1,10 @@
 import Constants from "expo-constants";
 
-const api = 
-    Constants.expoConfig?.hostUri?.split(':').shift()?.concat(':5000') ??
-    'http://192.168.18.6:5000';
+const HOST = 
+    Constants.expoConfig?.hostUri?.split(':').shift() ??
+    '192.168.18.6';
+const HOST_WITH_PORT = `http://${HOST}:5000`
 
 export {
-    api,
+    HOST_WITH_PORT,
 }

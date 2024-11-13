@@ -1,6 +1,6 @@
 import React, { useCallback } from 'react';
 import { Button, View } from 'react-native';
-import { api } from '@/utils/constants';
+import { HOST_WITH_PORT } from '@/utils/constants';
 import * as DocumentPicker from 'expo-document-picker';
 
 export default function FileUploadComponent() {
@@ -37,7 +37,7 @@ export default function FileUploadComponent() {
       async function tryToUpload(file: File) {
         const data = new FormData();
         data.append('file', file);
-        await fetch(`${api}/upload`, {
+        await fetch(`${HOST_WITH_PORT}/upload`, {
           method: 'POST',
           body: data
         });
