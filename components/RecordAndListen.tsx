@@ -39,7 +39,7 @@ export default function RecordAndListen(props: {
         await recording.stopAndUnloadAsync();
         await putIntoLocalRecordings();
         const uri = recording.getURI();
-        if (uri) 
+        if (uri)
             await saveNewRecording(uri);
 
         async function putIntoLocalRecordings() {
@@ -54,7 +54,8 @@ export default function RecordAndListen(props: {
             let blob = await fetch(recordingUri).then(r => r.blob())
             reader.readAsDataURL(blob); 
             reader.onloadend = () => {
-                if (reader.result == 'string') uploadRecording(reader.result)
+                if (typeof reader.result == 'string') 
+                    uploadRecording(reader.result)
             }
         }
 
@@ -64,7 +65,7 @@ export default function RecordAndListen(props: {
             fetch(`${HOST_WITH_PORT}/upload_recording/largeone?chunk_name=0.wav`, {
                 method: 'POST',
                 body: formData,
-            })
+            }).catch((err) => console.error(err.message))
         }
     }
 
