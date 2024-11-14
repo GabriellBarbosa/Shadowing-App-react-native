@@ -7,13 +7,12 @@ import FileUploadComponent from '@/components/FileUploadComponent';
 
 export default function HomeScreen() {
   const [audios, setAudios] = React.useState<string[]>([]);
-  const [err, setErr] = React.useState<string>();
 
   React.useEffect(() => {
     fetch(`${HOST_WITH_PORT}/audios`)
       .then((res) => res.json())
       .then((json) => setAudios(json.audios))
-      .catch((err) => setErr(err.message));
+      .catch((err) => console.error(err.message));
   }, []);
 
   return (

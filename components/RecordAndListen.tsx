@@ -1,6 +1,8 @@
 import React from "react";
 import { Audio } from "expo-av";
 import { Button, StyleSheet, View } from "react-native";
+import { playAudio } from "@/utils/functions";
+import { HOST_WITH_PORT } from "@/utils/constants";
 
 export default function RecordAndListen(props: {
     recordings: Audio.Sound[],
@@ -25,33 +27,50 @@ export default function RecordAndListen(props: {
                     allowsRecordingIOS: true,
                     playsInSilentModeIOS: true
                 });
-                const audio = await Audio.Recording.createAsync(audioPreset);
-                return audio.recording;
+                const { recording } = await Audio.Recording.createAsync(audioPreset);
+                return recording;
             }
             return undefined;
         }
     }
     
-    async function stopRecording() {
+    async function stopRecording(recording: Audio.Recording) {
         setRecording(undefined);
-        
-        if (recording) {
-            const sound = await loadRecording(recording);
+        await recording.stopAndUnloadAsync();
+        await putIntoLocalRecordings();
+        const uri = recording.getURI();
+        if (uri) 
+            await saveNewRecording(uri);
+
+        async function putIntoLocalRecordings() {
+            const { sound } = await recording.createNewLoadedSoundAsync();
             const allRecordings = [...props.recordings];
             allRecordings[props.index] = sound;
             props.setRecordings(allRecordings);
         }
 
-        async function loadRecording(recording: Audio.Recording) {
-            await recording.stopAndUnloadAsync();
-            const { sound } = await recording.createNewLoadedSoundAsync();
-            return sound;
+        async function saveNewRecording(recordingUri: string) {
+            const reader = new FileReader();
+            let blob = await fetch(recordingUri).then(r => r.blob())
+            reader.readAsDataURL(blob); 
+            reader.onloadend = () => {
+                if (reader.result == 'string') uploadRecording(reader.result)
+            }
+        }
+
+        function uploadRecording(base64: string) {
+            const formData = new FormData();
+            formData.append('recording', base64)
+            fetch(`${HOST_WITH_PORT}/upload_recording/largeone?chunk_name=0.wav`, {
+                method: 'POST',
+                body: formData,
+            })
         }
     }
 
     async function toggleRecording() {
         if (recording)
-            await stopRecording()
+            await stopRecording(recording)
         else 
             await startRecording()
     }
@@ -63,7 +82,7 @@ export default function RecordAndListen(props: {
                     <View style={styles.wide}>
                         <Button 
                             title="Listen" 
-                            onPress={() => props.recordings[props.index].replayAsync()}
+                            onPress={async () => playAudio(props.recordings[props.index])}
                         />
                     </View>
                     <View style={styles.wide}>

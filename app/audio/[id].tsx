@@ -4,6 +4,7 @@ import { useLocalSearchParams } from "expo-router";
 import { Audio } from 'expo-av';
 import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
 import { HOST_WITH_PORT } from "@/utils/constants";
+import { playAudio } from "@/utils/functions";
 
 import RecordAndListen from "@/components/RecordAndListen";
 
@@ -49,11 +50,6 @@ export default function AudioScreen() {
                     setRecordings={setRecordings} />
             </View>
         )
-
-        async function playAudio(audio: Audio.Sound) {
-            await audio.setPositionAsync(0);
-            await audio.playAsync();
-        }
     };
 
     return (
