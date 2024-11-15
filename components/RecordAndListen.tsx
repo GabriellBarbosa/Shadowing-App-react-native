@@ -50,22 +50,14 @@ export default function RecordAndListen(props: {
         }
 
         async function saveNewRecording(recordingUri: string) {
-            const reader = new FileReader();
-            let blob = await fetch(recordingUri).then(r => r.blob())
-            reader.readAsDataURL(blob); 
-            reader.onloadend = () => {
-                if (typeof reader.result == 'string') 
-                    uploadRecording(reader.result)
-            }
-        }
-
-        function uploadRecording(base64: string) {
+            const blob = await fetch(recordingUri).then(r => r.blob())
             const formData = new FormData();
-            formData.append('recording', base64)
+            formData.append('file', blob);
             fetch(`${HOST_WITH_PORT}/upload_recording/largeone?chunk_name=0.wav`, {
                 method: 'POST',
                 body: formData,
-            }).catch((err) => console.error(err.message))
+            })
+            .catch((err) => console.error(err.message))
         }
     }
 
