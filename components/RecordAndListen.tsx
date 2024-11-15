@@ -2,15 +2,24 @@ import React from "react";
 import { Audio } from "expo-av";
 import { Button, StyleSheet, View } from "react-native";
 import { playAudio } from "@/utils/functions";
-import { HOST_WITH_PORT } from "@/utils/constants";
+import { SERVER_HOST } from "@/utils/constants";
 
 export default function RecordAndListen(props: {
+    index: number,
+    audioName: string,
+    chunkName: string,
     recordings: Audio.Sound[],
     setRecordings: (arg: Audio.Sound[]) => void,
-    index: number
 }) {
     const [recording, setRecording] = React.useState<Audio.Recording | undefined>(undefined);
     const audioPreset = Audio.RecordingOptionsPresets.HIGH_QUALITY;
+
+    async function toggleRecording() {
+        if (recording)
+            await stopRecording(recording)
+        else 
+            await startRecording()
+    }
 
     async function startRecording() {
         try {
@@ -39,8 +48,7 @@ export default function RecordAndListen(props: {
         await recording.stopAndUnloadAsync();
         await putIntoLocalRecordings();
         const uri = recording.getURI();
-        if (uri)
-            await saveNewRecording(uri);
+        if (uri) await saveNewRecording(uri);
 
         async function putIntoLocalRecordings() {
             const { sound } = await recording.createNewLoadedSoundAsync();
@@ -53,19 +61,12 @@ export default function RecordAndListen(props: {
             const blob = await fetch(recordingUri).then(r => r.blob())
             const formData = new FormData();
             formData.append('file', blob);
-            fetch(`${HOST_WITH_PORT}/upload_recording/largeone?chunk_name=0.wav`, {
+            fetch(`${SERVER_HOST}/upload_recording/${props.audioName}?chunk_name=${props.chunkName}`, {
                 method: 'POST',
                 body: formData,
             })
             .catch((err) => console.error(err.message))
         }
-    }
-
-    async function toggleRecording() {
-        if (recording)
-            await stopRecording(recording)
-        else 
-            await startRecording()
     }
 
     return (

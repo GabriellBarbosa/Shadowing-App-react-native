@@ -3,18 +3,23 @@ import { Button, FlatList, StyleSheet, View } from "react-native";
 import { useLocalSearchParams } from "expo-router";
 import { Audio } from 'expo-av';
 import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
-import { HOST_WITH_PORT } from "@/utils/constants";
+import { SERVER_HOST } from "@/utils/constants";
 import { playAudio } from "@/utils/functions";
 
 import RecordAndListen from "@/components/RecordAndListen";
 
+interface AudioChunk {
+    sound: Audio.Sound;
+    name: string;
+}
+
 export default function AudioScreen() {
     const { id } = useLocalSearchParams();
-    const [audios, setAudios] = React.useState<Audio.Sound[]>([]);
+    const [audios, setAudios] = React.useState<AudioChunk[]>([]);
     const [recordings, setRecordings] = React.useState<Audio.Sound[]>([]);
 
     React.useEffect(() => {
-        fetch(`${HOST_WITH_PORT}/audio/${id}`)
+        fetch(`${SERVER_HOST}/audio/${id}`)
         .then((res) => res.json())
         .then(async (audios) => {
             const loadedAudios = await loadAudios(audios);
@@ -28,26 +33,33 @@ export default function AudioScreen() {
         const result = [];
         for await (const url of audiosUrl) {
             const loaded = await Audio.Sound.createAsync({
-                uri: `${HOST_WITH_PORT}/${url}`,
+                uri: `${SERVER_HOST}/${url}`,
             });
-            result.push(loaded.sound);
+            result.push({sound: loaded.sound, name: getNameFromUrl(url)});
         }
         return result;
+
+        function getNameFromUrl(url: string) {
+            return url.split('/').pop() ?? '';
+        }
     }
 
-    const Shadowing = (props: {audio: Audio.Sound, index: number}) => {
+    const Shadowing = (props: {audio: AudioChunk, index: number}) => {
         return (
             <View style={styles.wrapper}>
                 <View style={styles.nativeSpeechBtn}>
                     <Button
-                        onPress={async () => await playAudio(props.audio)}
+                        onPress={async () => await playAudio(props.audio.sound)}
                         title="Native"
                     />
                 </View>
-                <RecordAndListen 
+                <RecordAndListen
                     index={props.index} 
+                    audioName={id as string}
+                    chunkName={props.audio.name}
                     recordings={recordings} 
-                    setRecordings={setRecordings} />
+                    setRecordings={setRecordings}
+                />
             </View>
         )
     };
