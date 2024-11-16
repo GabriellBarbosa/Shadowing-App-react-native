@@ -3,15 +3,17 @@ import { Audio } from "expo-av";
 import { Button, StyleSheet, View } from "react-native";
 import { playAudio } from "@/utils/functions";
 import { SERVER_HOST } from "@/utils/constants";
+import AudioChunk from "@/interfaces/AudioChunk";
 
 export default function RecordAndListen(props: {
     index: number,
     audioName: string,
     chunkName: string,
-    recordings: Audio.Sound[],
-    setRecordings: (arg: Audio.Sound[]) => void,
+    recordings: Array<AudioChunk | null>,
+    setRecordings: (arg: Array<AudioChunk | null>) => void,
 }) {
     const [recording, setRecording] = React.useState<Audio.Recording | undefined>(undefined);
+    const [err, setErr] = React.useState<string>();
     const audioPreset = Audio.RecordingOptionsPresets.HIGH_QUALITY;
 
     async function toggleRecording() {
@@ -53,7 +55,7 @@ export default function RecordAndListen(props: {
         async function putIntoLocalRecordings() {
             const { sound } = await recording.createNewLoadedSoundAsync();
             const allRecordings = [...props.recordings];
-            allRecordings[props.index] = sound;
+            allRecordings[props.index] = {sound, name: ''};
             props.setRecordings(allRecordings);
         }
 
@@ -65,7 +67,7 @@ export default function RecordAndListen(props: {
                 method: 'POST',
                 body: formData,
             })
-            .catch((err) => console.error(err.message))
+            .catch((err) => console.error(err))
         }
     }
 
@@ -76,7 +78,7 @@ export default function RecordAndListen(props: {
                     <View style={styles.wide}>
                         <Button 
                             title="Listen" 
-                            onPress={async () => playAudio(props.recordings[props.index])}
+                            onPress={async () => playAudio((props.recordings[props.index] as AudioChunk).sound)}
                         />
                     </View>
                     <View style={styles.wide}>
