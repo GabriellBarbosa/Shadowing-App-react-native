@@ -13,7 +13,6 @@ export default function RecordAndListen(props: {
     setRecordings: (arg: Array<AudioChunk | null>) => void,
 }) {
     const [recording, setRecording] = React.useState<Audio.Recording | undefined>(undefined);
-    const [err, setErr] = React.useState<string>();
     const audioPreset = Audio.RecordingOptionsPresets.HIGH_QUALITY;
 
     async function toggleRecording() {

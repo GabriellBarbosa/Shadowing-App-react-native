@@ -7,6 +7,7 @@
     "icon": "./assets/images/icon.png",
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
     "splash": {
       "image": "./assets/images/splash.png",
       "resizeMode": "contain",
@@ -20,9 +21,6 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "permissions": [
-        "INTERNET"
-      ],
       "package": "com.bielbarbosa900.shadowing"
     },
     "web": {
@@ -32,17 +30,6 @@
     },
     "plugins": [
       "expo-router",
-      [
-        "expo-build-properties",
-        {
-          "android": {
-            "usesCleartextTraffic": true
-          },
-          "ios": {
-            "flipper": true
-          }
-        }
-      ],
       "expo-font"
     ],
     "experiments": {
