@@ -60,14 +60,23 @@ export default function RecordAndListen(props: {
 
         async function saveNewRecording(recordingUri: string) {
             const blob = await fetch(recordingUri).then(r => r.blob())
-            const formData = new FormData();
-            formData.append('file', blob);
+            const b64 = await blobToBase64(blob)
             fetch(`${SERVER_HOST}/upload_recording/${props.audioName}?chunk_name=${props.chunkName}`, {
                 method: 'POST',
-                body: formData,
+                body: JSON.stringify({ b64 }),
+                headers: { 'content-type': 'application/json' }
             })
-            .catch((err) => console.error(err))
+            .catch((err) => console.error(err.message))
         }
+
+        function blobToBase64(blob: Blob) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onloadend = () => resolve(reader.result);
+                reader.onerror = reject;
+                reader.readAsDataURL(blob);
+            });
+        };
     }
 
     return (
