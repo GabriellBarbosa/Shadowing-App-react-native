@@ -1,16 +1,16 @@
 import React from "react";
 import { Audio } from "expo-av";
 import { Button, StyleSheet, View } from "react-native";
-import { playAudio } from "@/utils/functions";
+import { playAudio, playFromUri } from "@/utils/functions";
 import { SERVER_HOST } from "@/utils/constants";
-import AudioChunk from "@/interfaces/AudioChunk";
+import { Recording } from "@/interfaces/Recording";
 
 export default function RecordAndListen(props: {
     index: number,
     audioName: string,
     chunkName: string,
-    recordings: Array<AudioChunk | null>,
-    setRecordings: (arg: Array<AudioChunk | null>) => void,
+    recordings: Array<Recording | null>,
+    setRecordings: (arg: Array<Recording | null>) => void,
 }) {
     const [recording, setRecording] = React.useState<Audio.Recording | undefined>(undefined);
     const audioPreset = Audio.RecordingOptionsPresets.HIGH_QUALITY;
@@ -46,6 +46,7 @@ export default function RecordAndListen(props: {
     
     async function stopRecording(recording: Audio.Recording) {
         setRecording(undefined);
+
         await recording.stopAndUnloadAsync();
         await putIntoLocalRecordings();
         const uri = recording.getURI();
@@ -54,7 +55,7 @@ export default function RecordAndListen(props: {
         async function putIntoLocalRecordings() {
             const { sound } = await recording.createNewLoadedSoundAsync();
             const allRecordings = [...props.recordings];
-            allRecordings[props.index] = {sound, name: ''};
+            allRecordings[props.index] = sound;
             props.setRecordings(allRecordings);
         }
 
@@ -65,8 +66,7 @@ export default function RecordAndListen(props: {
                 method: 'POST',
                 body: JSON.stringify({ b64 }),
                 headers: { 'content-type': 'application/json' }
-            })
-            .catch((err) => console.error(err.message))
+            }) .catch((err) => console.error(err.message))
         }
 
         function blobToBase64(blob: Blob) {
@@ -79,6 +79,15 @@ export default function RecordAndListen(props: {
         };
     }
 
+    async function playRecording(rec: Recording | null) {
+        if (rec == null) 
+            return;
+        else if (rec instanceof Audio.Sound)
+            await playAudio(rec);
+        else
+            await playFromUri(rec.path);
+    }
+
     return (
         <View>
             {props.recordings[props.index] ? (
@@ -86,7 +95,7 @@ export default function RecordAndListen(props: {
                     <View style={styles.wide}>
                         <Button 
                             title="You" 
-                            onPress={async () => playAudio((props.recordings[props.index] as AudioChunk).sound)}
+                            onPress={async () => playRecording(props.recordings[props.index])}
                         />
                     </View>
                     <View style={styles.wide}>

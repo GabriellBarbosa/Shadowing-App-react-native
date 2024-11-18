@@ -5,6 +5,13 @@ async function playAudio(audio: Audio.Sound) {
     await audio.playAsync();
 }
 
+async function playFromUri(uri: string) {
+    const sound = new Audio.Sound();
+    await sound.loadAsync({uri});
+    await sound.playAsync();
+}
+
 export {
-    playAudio
+    playAudio,
+    playFromUri
 }

@@ -1,22 +1,18 @@
 import React from "react";
+import AudioChunk from "@/interfaces/AudioChunk";
+import { Recording } from "@/interfaces/Recording";
 import { Button, FlatList, StyleSheet, View } from "react-native";
 import { useLocalSearchParams } from "expo-router";
-import { Audio } from 'expo-av';
 import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
 import { SERVER_HOST } from "@/utils/constants";
-import AudioChunk from "@/interfaces/AudioChunk";
+import { playFromUri } from "@/utils/functions";
 
 import RecordAndListen from "@/components/RecordAndListen";
 
-interface Original {
-    name: string;
-    path: string;
-}
-
 export default function AudioScreen() {
     const { id } = useLocalSearchParams();
-    const [recordings, setRecordings] = React.useState<Array<AudioChunk | null>>([]);
-    const [originals, setOriginals] = React.useState<Array<Original | null>>([]);
+    const [originals, setOriginals] = React.useState<Array<AudioChunk | null>>([]);
+    const [recordings, setRecordings] = React.useState<Array<Recording | null>>([]);
 
     React.useEffect(() => {
         fetch(`${SERVER_HOST}/audio/${id}`)
@@ -28,43 +24,19 @@ export default function AudioScreen() {
     React.useEffect(() => {
         fetch(`${SERVER_HOST}/recording/${id}`)
         .then((res) => res.json())
-        .then(async (audios) => {
-            const loadedAudios = await loadAudios(audios);
-            setRecordings(loadedAudios);
-        })
+        .then(async (URIs) => setRecordings(URIs))
         .catch((err) => console.error(err));
     }, []);
     
-    async function playFromUri(uri: string) {
-        const sound = new Audio.Sound();
-        await sound.loadAsync({uri});
-        await sound.playAsync();
-    }
-
-    async function loadAudios(audiosUrl: string[]) {
-        const result = [];
-        for await (const url of audiosUrl) {
-            if (url) {
-                const { sound } = await Audio.Sound.createAsync({uri: `${SERVER_HOST}/${url}`});
-                result.push({sound, name: getNameFromUrl(url)});
-            } else {
-                result.push(null);
-            }
-        }
-        return result;
-
-        function getNameFromUrl(url: string) {
-            return url.split('/').pop() ?? '';
-        }
-    }
-
-    const Shadowing = (props: {original: Original | null, index: number}) => {
+    const Shadowing = (props: {original: AudioChunk | null, index: number}) => {
         if (props.original == null) return
         return (
             <View style={styles.wrapper}>
                 <View style={styles.nativeSpeechBtn}>
                     <Button
-                        onPress={async () => await playFromUri(originals[props.index]?.path ?? '')}
+                        onPress={async () => {
+                            await playFromUri((originals[props.index] as AudioChunk).path)
+                        }}
                         title="Original"
                     />
                 </View>
