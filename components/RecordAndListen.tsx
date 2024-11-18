@@ -85,7 +85,7 @@ export default function RecordAndListen(props: {
                 <View style={styles.row}>
                     <View style={styles.wide}>
                         <Button 
-                            title="Listen" 
+                            title="You" 
                             onPress={async () => playAudio((props.recordings[props.index] as AudioChunk).sound)}
                         />
                     </View>

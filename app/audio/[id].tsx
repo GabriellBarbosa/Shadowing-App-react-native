@@ -4,23 +4,24 @@ import { useLocalSearchParams } from "expo-router";
 import { Audio } from 'expo-av';
 import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
 import { SERVER_HOST } from "@/utils/constants";
-import { playAudio } from "@/utils/functions";
 import AudioChunk from "@/interfaces/AudioChunk";
 
 import RecordAndListen from "@/components/RecordAndListen";
 
+interface Original {
+    name: string;
+    path: string;
+}
+
 export default function AudioScreen() {
     const { id } = useLocalSearchParams();
-    const [audios, setAudios] = React.useState<Array<AudioChunk | null>>([]);
     const [recordings, setRecordings] = React.useState<Array<AudioChunk | null>>([]);
+    const [originals, setOriginals] = React.useState<Array<Original | null>>([]);
 
     React.useEffect(() => {
         fetch(`${SERVER_HOST}/audio/${id}`)
         .then((res) => res.json())
-        .then(async (audios) => {
-            const loadedAudios = await loadAudios(audios);
-            setAudios(loadedAudios);
-        })
+        .then((URIs) => setOriginals(URIs))
         .catch((err) => console.error(err));
     }, []);
 
@@ -34,6 +35,12 @@ export default function AudioScreen() {
         .catch((err) => console.error(err));
     }, []);
     
+    async function playFromUri(uri: string) {
+        const sound = new Audio.Sound();
+        await sound.loadAsync({uri});
+        await sound.playAsync();
+    }
+
     async function loadAudios(audiosUrl: string[]) {
         const result = [];
         for await (const url of audiosUrl) {
@@ -51,20 +58,20 @@ export default function AudioScreen() {
         }
     }
 
-    const Shadowing = (props: {audio: AudioChunk | null, index: number}) => {
-        if (props.audio == null) return
+    const Shadowing = (props: {original: Original | null, index: number}) => {
+        if (props.original == null) return
         return (
             <View style={styles.wrapper}>
                 <View style={styles.nativeSpeechBtn}>
                     <Button
-                        onPress={async () => await playAudio((props.audio as AudioChunk).sound)}
-                        title="Native"
+                        onPress={async () => await playFromUri(originals[props.index]?.path ?? '')}
+                        title="Original"
                     />
                 </View>
                 <RecordAndListen
                     index={props.index} 
                     audioName={id as string}
-                    chunkName={props.audio.name}
+                    chunkName={props.original.name}
                     recordings={recordings} 
                     setRecordings={setRecordings}
                 />
@@ -76,8 +83,8 @@ export default function AudioScreen() {
         <SafeAreaProvider>
             <SafeAreaView style={styles.container}>
                 <FlatList
-                    data={audios}
-                    renderItem={({item, index}) => <Shadowing audio={item} index={index} />}
+                    data={originals}
+                    renderItem={({item, index}) => <Shadowing original={item} index={index} />}
                     keyExtractor={(_item, index) => String(index)}
                 />
             </SafeAreaView>
