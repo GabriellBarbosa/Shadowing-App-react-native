@@ -89,33 +89,47 @@ export default function RecordAndListen(props: {
     }
 
     return (
-        <View style={styles.container}>
+        <View>
             {props.recordings[props.index] ? (
                 <View style={styles.row}>
                     <Pressable
                         style={styles.listenBtn}
                         onPress={async () => playRecording(props.recordings[props.index])}
-                    ><Image style={styles.playAndPauseIcon} source={require('../assets/images/play-button.png')} /></Pressable>
-                    <View>
-                        <Button
-                            onPress={async () => await toggleRecording()}
-                            title={recording ? 'Stop' : 'Try Again'}
+                    >
+                        <Image 
+                            style={styles.playAndPauseIcon} 
+                            source={require('../assets/images/play-button.png')}
+                            alt="play"
                         />
-                    </View>
+                    </Pressable>
+                    <Pressable
+                        style={styles.recordBtn}
+                        onPress={async () => await toggleRecording()}
+                    >
+                        <Image
+                            style={styles.recordIcon} 
+                            source={require('../assets/images/microphone.png')}
+                            alt="record"
+                        />
+                    </Pressable>
                 </View>
             ) : (
-                <Button
+                <Pressable
+                    style={styles.recordBtn}
                     onPress={async () => await toggleRecording()}
-                    title={recording ? 'Stop' : 'Record'}
+                >
+                <Image
+                    style={styles.recordIcon} 
+                    source={require('../assets/images/microphone.png')}
+                    alt="record"
                 />
+            </Pressable>
             )}
         </View>
     );
 }
 
 const styles = StyleSheet.create({
-    container: {
-    },
     row: {
         flexDirection: 'row',
         justifyContent: 'flex-end',
@@ -127,14 +141,22 @@ const styles = StyleSheet.create({
         paddingVertical: 20,
         paddingHorizontal: 15,
         borderBottomLeftRadius: 8,
-        borderBottomRightRadius: 8,
         borderTopLeftRadius: 8
-    },
-    tryAgainBtn: {
-        
     },
     playAndPauseIcon: {
         width: 24,
         height: 24
+    },
+    recordBtn: {
+        backgroundColor: '#246a73',
+        paddingVertical: 20,
+        paddingHorizontal: 15,
+        alignSelf: 'flex-end',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    recordIcon: {
+        width: 24,
+        height: 24,
     }
 })

@@ -71,7 +71,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#212529'
     },
     nativeSpeechBtn: {
-        marginVertical: 15,
+        marginVertical: 20,
         width: 320
     },
     recordingBtnsWrapper: {
