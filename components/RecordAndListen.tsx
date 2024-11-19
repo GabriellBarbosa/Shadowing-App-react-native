@@ -1,6 +1,6 @@
 import React from "react";
 import { Audio } from "expo-av";
-import { Button, StyleSheet, View } from "react-native";
+import { Button, Image, Pressable, StyleSheet, Text, View } from "react-native";
 import { playAudio, playFromUri } from "@/utils/functions";
 import { SERVER_HOST } from "@/utils/constants";
 import { Recording } from "@/interfaces/Recording";
@@ -92,12 +92,10 @@ export default function RecordAndListen(props: {
         <View style={styles.container}>
             {props.recordings[props.index] ? (
                 <View style={styles.row}>
-                    <View style={styles.item}>
-                        <Button 
-                            title="You" 
-                            onPress={async () => playRecording(props.recordings[props.index])}
-                        />
-                    </View>
+                    <Pressable
+                        style={styles.listenBtn}
+                        onPress={async () => playRecording(props.recordings[props.index])}
+                    ><Image style={styles.playAndPauseIcon} source={require('../assets/images/play-button.png')} /></Pressable>
                     <View>
                         <Button
                             onPress={async () => await toggleRecording()}
@@ -123,7 +121,20 @@ const styles = StyleSheet.create({
         justifyContent: 'flex-end',
         columnGap: 1,
     },
-    item: {
-        flex: 1
+    listenBtn: {
+        flex: 1,
+        backgroundColor: '#246a73',
+        paddingVertical: 20,
+        paddingHorizontal: 15,
+        borderBottomLeftRadius: 8,
+        borderBottomRightRadius: 8,
+        borderTopLeftRadius: 8
+    },
+    tryAgainBtn: {
+        
+    },
+    playAndPauseIcon: {
+        width: 24,
+        height: 24
     }
 })

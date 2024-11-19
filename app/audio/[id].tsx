@@ -55,7 +55,7 @@ export default function AudioScreen() {
 
     return (
         <SafeAreaProvider>
-            <SafeAreaView>
+            <SafeAreaView style={styles.container}>
                 <FlatList
                     data={originals}
                     renderItem={({item, index}) => <Shadowing original={item} index={index} />}
@@ -67,12 +67,15 @@ export default function AudioScreen() {
 }
 
 const styles = StyleSheet.create({
+    container: {
+        backgroundColor: '#212529'
+    },
     nativeSpeechBtn: {
         marginVertical: 15,
-        width: 300
+        width: 320
     },
     recordingBtnsWrapper: {
-        width: 300,
+        width: 320,
         alignSelf: 'flex-end'
     }
 })
