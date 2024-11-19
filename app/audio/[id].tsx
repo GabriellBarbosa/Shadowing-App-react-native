@@ -31,7 +31,7 @@ export default function AudioScreen() {
     const Shadowing = (props: {original: AudioChunk | null, index: number}) => {
         if (props.original == null) return
         return (
-            <View style={styles.wrapper}>
+            <View>
                 <View style={styles.nativeSpeechBtn}>
                     <Button
                         onPress={async () => {
@@ -40,20 +40,22 @@ export default function AudioScreen() {
                         title="Original"
                     />
                 </View>
-                <RecordAndListen
-                    index={props.index} 
-                    audioName={id as string}
-                    chunkName={props.original.name}
-                    recordings={recordings} 
-                    setRecordings={setRecordings}
-                />
+                <View style={styles.recordingBtnsWrapper}>
+                    <RecordAndListen
+                        index={props.index} 
+                        audioName={id as string}
+                        chunkName={props.original.name}
+                        recordings={recordings} 
+                        setRecordings={setRecordings}
+                    />
+                </View>
             </View>
         )
     };
 
     return (
         <SafeAreaProvider>
-            <SafeAreaView style={styles.container}>
+            <SafeAreaView>
                 <FlatList
                     data={originals}
                     renderItem={({item, index}) => <Shadowing original={item} index={index} />}
@@ -65,14 +67,12 @@ export default function AudioScreen() {
 }
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        padding: 10 
-    },
-    wrapper: {
-        marginVertical: 10
-    },
     nativeSpeechBtn: {
-        marginBottom: 1
+        marginVertical: 15,
+        width: 300
+    },
+    recordingBtnsWrapper: {
+        width: 300,
+        alignSelf: 'flex-end'
     }
 })

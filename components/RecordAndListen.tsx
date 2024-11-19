@@ -89,16 +89,16 @@ export default function RecordAndListen(props: {
     }
 
     return (
-        <View>
+        <View style={styles.container}>
             {props.recordings[props.index] ? (
                 <View style={styles.row}>
-                    <View style={styles.wide}>
+                    <View style={styles.item}>
                         <Button 
                             title="You" 
                             onPress={async () => playRecording(props.recordings[props.index])}
                         />
                     </View>
-                    <View style={styles.wide}>
+                    <View>
                         <Button
                             onPress={async () => await toggleRecording()}
                             title={recording ? 'Stop' : 'Try Again'}
@@ -116,12 +116,14 @@ export default function RecordAndListen(props: {
 }
 
 const styles = StyleSheet.create({
+    container: {
+    },
     row: {
-        display: 'flex',
         flexDirection: 'row',
+        justifyContent: 'flex-end',
         columnGap: 1,
     },
-    wide: {
+    item: {
         flex: 1
-    },
+    }
 })
