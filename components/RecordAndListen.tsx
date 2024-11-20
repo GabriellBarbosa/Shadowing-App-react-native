@@ -1,9 +1,10 @@
 import React from "react";
 import { Audio } from "expo-av";
-import { Button, Image, Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, View } from "react-native";
 import { playAudio, playFromUri } from "@/utils/functions";
 import { SERVER_HOST } from "@/utils/constants";
 import { Recording } from "@/interfaces/Recording";
+import Ionicons from "@expo/vector-icons/Ionicons";
 
 export default function RecordAndListen(props: {
     index: number,
@@ -95,35 +96,17 @@ export default function RecordAndListen(props: {
                     <Pressable
                         style={styles.listenBtn}
                         onPress={async () => playRecording(props.recordings[props.index])}
-                    >
-                        <Image 
-                            style={styles.playAndPauseIcon} 
-                            source={require('../assets/images/play-button.png')}
-                            alt="play"
-                        />
-                    </Pressable>
+                    ><Ionicons name="play" size={36} color="#d3d3d3" /></Pressable>
                     <Pressable
                         style={styles.recordBtn}
                         onPress={async () => await toggleRecording()}
-                    >
-                        <Image
-                            style={styles.recordIcon} 
-                            source={require('../assets/images/microphone.png')}
-                            alt="record"
-                        />
-                    </Pressable>
+                    ><Ionicons name="mic" size={36} color="#d3d3d3" /></Pressable>
                 </View>
             ) : (
                 <Pressable
                     style={styles.recordBtn}
                     onPress={async () => await toggleRecording()}
-                >
-                <Image
-                    style={styles.recordIcon} 
-                    source={require('../assets/images/microphone.png')}
-                    alt="record"
-                />
-            </Pressable>
+                ><Ionicons name="mic" size={36} color="#d3d3d3" /></Pressable>
             )}
         </View>
     );
