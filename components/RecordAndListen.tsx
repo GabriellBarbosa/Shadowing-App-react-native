@@ -14,7 +14,26 @@ export default function RecordAndListen(props: {
     setRecordings: (arg: Array<Recording | null>) => void,
 }) {
     const [recording, setRecording] = React.useState<Audio.Recording | undefined>(undefined);
+    const [audio, setAudio] = React.useState<Audio.Sound | undefined>(undefined);
+    const [playing, setPlaying] = React.useState<boolean>();
     const audioPreset = Audio.RecordingOptionsPresets.HIGH_QUALITY;
+
+    React.useEffect(() => {
+        if (audio)
+            updatePlayingStatus(audio);
+
+        async function updatePlayingStatus(audio: Audio.Sound) {
+            const intervalId = setInterval(async () => {
+                const status = await audio.getStatusAsync();
+                const isPlaying = status.isLoaded && status.isPlaying;
+                if (!isPlaying) {
+                    clearInterval(intervalId)
+                    setAudio(undefined);
+                }
+                setPlaying(isPlaying);
+            }, 400);
+        }
+    }, [audio, playing])
 
     async function toggleRecording() {
         if (recording)
@@ -83,10 +102,16 @@ export default function RecordAndListen(props: {
     async function playRecording(rec: Recording | null) {
         if (rec == null) 
             return;
-        else if (rec instanceof Audio.Sound)
-            await playAudio(rec);
-        else
-            await playFromUri(rec.path);
+        else if (rec instanceof Audio.Sound) {
+            setAudio(rec);
+            await rec.setPositionAsync(0);
+            await rec.playAsync();
+        } else {
+            const sound = new Audio.Sound();
+            setAudio(sound);
+            await sound.loadAsync({uri: rec.path});
+            await sound.playAsync();
+        }
     }
 
     return (
@@ -96,7 +121,7 @@ export default function RecordAndListen(props: {
                     <Pressable
                         style={styles.listenBtn}
                         onPress={async () => playRecording(props.recordings[props.index])}
-                    ><Ionicons name="play" size={36} color="#d3d3d3" /></Pressable>
+                    ><Ionicons name={playing ? 'pause' : 'play'} size={36} color="#d3d3d3" /></Pressable>
                     <Pressable
                         style={styles.recordBtn}
                         onPress={async () => await toggleRecording()}
