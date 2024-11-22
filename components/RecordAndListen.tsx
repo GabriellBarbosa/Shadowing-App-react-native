@@ -1,7 +1,6 @@
 import React from "react";
 import { Audio } from "expo-av";
 import { Pressable, StyleSheet, View } from "react-native";
-import { playAudio, playFromUri } from "@/utils/functions";
 import { SERVER_HOST } from "@/utils/constants";
 import { Recording } from "@/interfaces/Recording";
 import Ionicons from "@expo/vector-icons/Ionicons";
@@ -13,9 +12,10 @@ export default function RecordAndListen(props: {
     recordings: Array<Recording | null>,
     setRecordings: (arg: Array<Recording | null>) => void,
 }) {
-    const [recording, setRecording] = React.useState<Audio.Recording | undefined>(undefined);
     const [audio, setAudio] = React.useState<Audio.Sound | undefined>(undefined);
     const [playing, setPlaying] = React.useState<boolean>();
+    const [recording, setRecording] = React.useState<Audio.Recording | undefined>(undefined);
+
     const audioPreset = Audio.RecordingOptionsPresets.HIGH_QUALITY;
 
     React.useEffect(() => {
@@ -125,13 +125,25 @@ export default function RecordAndListen(props: {
                     <Pressable
                         style={styles.recordBtn}
                         onPress={async () => await toggleRecording()}
-                    ><Ionicons name="mic" size={36} color="#d3d3d3" /></Pressable>
+                    >
+                        {recording ? (
+                            <Ionicons name="radio-button-on" size={36} color="#ff5a5f" />
+                        ) : (
+                            <Ionicons name="mic" size={36} color="#d3d3d3" />
+                        )}
+                    </Pressable>
                 </View>
             ) : (
                 <Pressable
                     style={styles.recordBtn}
                     onPress={async () => await toggleRecording()}
-                ><Ionicons name="mic" size={36} color="#d3d3d3" /></Pressable>
+                >
+                    {recording ? (
+                        <Ionicons name="radio-button-on" size={36} color="#ff5a5f" />
+                    ) : (
+                        <Ionicons name="mic" size={36} color="#d3d3d3" />
+                    )}
+                </Pressable>
             )}
         </View>
     );
