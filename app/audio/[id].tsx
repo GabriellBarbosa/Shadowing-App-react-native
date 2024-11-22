@@ -13,6 +13,7 @@ import { Audio } from "expo-av";
 interface PlayingSound {
     sound: Audio.Sound;
     index: number;
+    type: 'rec' | 'original';
 }
 
 export default function AudioScreen() {
@@ -28,12 +29,14 @@ export default function AudioScreen() {
         async function updatePlayingStatus(audio: Audio.Sound) {
             const intervalId = setInterval(async () => {
                 const status = await audio.getStatusAsync();
-                const isPlaying = status.isLoaded && status.isPlaying;
-                if (!isPlaying) {
-                    clearInterval(intervalId)
-                    setPlayingSound(undefined);
+                if (status.isLoaded) {
+                    if (status.positionMillis == status.durationMillis) {
+                        setPlayingSound(undefined);
+                        clearInterval(intervalId)
+                        await playingSound?.sound.unloadAsync();
+                    }
                 }
-            }, 400);
+            }, 500);
         }
     }, [playingSound])
 
@@ -52,10 +55,12 @@ export default function AudioScreen() {
     }, []);
 
     async function playFromUri(uri: string, index: number) {
-        const sound = new Audio.Sound();
-        setPlayingSound({sound, index});
-        await sound.loadAsync({uri});
-        await sound.playAsync();
+        if (!playingSound) {
+            const sound = new Audio.Sound();
+            setPlayingSound({sound, index, type: 'original'});
+            await sound.loadAsync({uri});
+            await sound.playAsync();
+        }
     }
 
     const Shadowing = (props: {original: AudioChunk | null, index: number}) => {
@@ -68,7 +73,13 @@ export default function AudioScreen() {
                     onPress={async () => {
                         await playFromUri((originals[props.index] as AudioChunk).path, props.index)
                     }}
-                ><Ionicons name={playingSound?.index == props.index ? 'pause' : 'play'} size={36} color="#d3d3d3" /></Pressable>
+                >
+                    <Ionicons 
+                        name={playingSound?.index == props.index && playingSound.type == 'original' ? 'pause' : 'play'}
+                        size={36} 
+                        color="#d3d3d3" 
+                    />
+                </Pressable>
                 <View style={styles.recordingBtnsWrapper}>
                     <RecordAndListen
                         index={props.index} 
