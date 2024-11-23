@@ -5,22 +5,17 @@ import { FlatList, Pressable, StyleSheet, Text, View } from "react-native";
 import { useLocalSearchParams } from "expo-router";
 import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
 import { SERVER_HOST } from "@/utils/constants";
+import { Audio } from "expo-av";
+import { PlayingContext } from "@/contexts/PlayingContext";
 
 import RecordAndListen from "@/components/RecordAndListen";
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { Audio } from "expo-av";
-
-interface PlayingSound {
-    sound: Audio.Sound;
-    index: number;
-    type: 'rec' | 'original';
-}
 
 export default function AudioScreen() {
     const { id } = useLocalSearchParams();
     const [originals, setOriginals] = React.useState<Array<AudioChunk | null>>([]);
     const [recordings, setRecordings] = React.useState<Array<Recording | null>>([]);
-    const [playingSound, setPlayingSound] = React.useState<PlayingSound>();
+    const { playingSound, setPlayingSound } = React.useContext(PlayingContext);
 
     React.useEffect(() => {
         if (playingSound)
