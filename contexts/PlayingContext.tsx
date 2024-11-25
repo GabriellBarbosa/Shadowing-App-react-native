@@ -30,7 +30,7 @@ export function PlayingProvider(props: React.PropsWithChildren) {
             if (await didJustFinished(sound)) {
                 setPlayingSound(undefined);
                 clearInterval(intervalId)
-                await playingSound?.sound.unloadAsync();
+                await sound.unloadAsync();
             }
         }, 500);
     }
