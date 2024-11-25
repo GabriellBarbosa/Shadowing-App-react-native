@@ -45,7 +45,7 @@ const styles = StyleSheet.create({
     paddingVertical: 20,
     paddingHorizontal: 15,
     borderTopWidth: 1,
-    borderColor: '#1b4332',
+    borderColor: '#0d1b2a',
     textTransform: 'uppercase',
     color: '#fff',
   }
