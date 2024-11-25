@@ -20,6 +20,26 @@ export const PlayingContext = React.createContext<Props>({
 export function PlayingProvider(props: React.PropsWithChildren) {
     const [playingSound, setPlayingSound] = React.useState<PlayingSound>();
 
+    React.useEffect(() => {
+        if (playingSound)
+            resetPlayingSoundWhenFinished(playingSound.sound);
+    }, [playingSound])
+
+    async function resetPlayingSoundWhenFinished(sound: Audio.Sound) {
+        const intervalId = setInterval(async () => {
+            if (await didJustFinished(sound)) {
+                setPlayingSound(undefined);
+                clearInterval(intervalId)
+                await playingSound?.sound.unloadAsync();
+            }
+        }, 500);
+    }
+
+    async function didJustFinished(sound: Audio.Sound) {
+        const status = await sound.getStatusAsync();
+        return status.isLoaded && status.positionMillis == status.durationMillis;
+    }
+
     return (
         <PlayingContext.Provider value={{ playingSound, setPlayingSound }}>
             {props.children}

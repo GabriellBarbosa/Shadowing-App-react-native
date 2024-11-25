@@ -18,24 +18,6 @@ export default function AudioScreen() {
     const { playingSound, setPlayingSound } = React.useContext(PlayingContext);
 
     React.useEffect(() => {
-        if (playingSound)
-            updatePlayingStatus(playingSound.sound);
-
-        async function updatePlayingStatus(audio: Audio.Sound) {
-            const intervalId = setInterval(async () => {
-                const status = await audio.getStatusAsync();
-                if (status.isLoaded) {
-                    if (status.positionMillis == status.durationMillis) {
-                        setPlayingSound(undefined);
-                        clearInterval(intervalId)
-                        await playingSound?.sound.unloadAsync();
-                    }
-                }
-            }, 500);
-        }
-    }, [playingSound])
-
-    React.useEffect(() => {
         fetch(`${SERVER_HOST}/audio/${id}`)
         .then((res) => res.json())
         .then((URIs) => setOriginals(URIs))

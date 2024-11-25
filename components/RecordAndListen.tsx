@@ -17,23 +17,6 @@ export default function RecordAndListen(props: {
     const [recording, setRecording] = React.useState<Audio.Recording | undefined>(undefined);
     const { playingSound, setPlayingSound } = React.useContext(PlayingContext);
 
-    React.useEffect(() => {
-        if (playingSound?.type == 'rec' && playingSound?.index == props.index) {
-            const intervalID = setInterval(async () => {
-                if (await didJustFinished(playingSound.sound)) {
-                    clearInterval(intervalID)
-                    setPlayingSound(undefined);
-                    await playingSound.sound.unloadAsync();
-                }
-            }, 400);
-        }
-    }, [playingSound])
-
-    async function didJustFinished(sound: Audio.Sound) {
-        const status = await sound.getStatusAsync();
-        return status.isLoaded && status.positionMillis == status.durationMillis;
-    }
-
     async function toggleRecording() {
         if (recording)
             await stopRecording(recording)
