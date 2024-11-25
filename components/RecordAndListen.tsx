@@ -166,10 +166,6 @@ const styles = StyleSheet.create({
         borderBottomLeftRadius: 8,
         borderTopLeftRadius: 8
     },
-    playAndPauseIcon: {
-        width: 24,
-        height: 24
-    },
     recordBtn: {
         backgroundColor: '#246a73',
         paddingVertical: 20,
@@ -178,8 +174,4 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
     },
-    recordIcon: {
-        width: 24,
-        height: 24,
-    }
 })
