@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { Link } from 'expo-router';
 import { SERVER_HOST } from '@/utils/constants';
 
@@ -35,10 +35,18 @@ export default function HomeScreen() {
 
 const styles = StyleSheet.create({
   container: {
-    margin: 10
+    backgroundColor: '#343a40',
+    flex: 1,
+    paddingVertical: 20,
+    paddingHorizontal: 10
   },
   link: {
-    paddingVertical: 10,
-    textTransform: 'uppercase'
+    marginTop: 20,
+    paddingVertical: 20,
+    paddingHorizontal: 15,
+    borderTopWidth: 1,
+    borderColor: '#1b4332',
+    textTransform: 'uppercase',
+    color: '#fff',
   }
 })

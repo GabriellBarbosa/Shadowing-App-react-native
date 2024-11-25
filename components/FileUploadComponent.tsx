@@ -46,7 +46,7 @@ export default function FileUploadComponent() {
 
     return (
       <View>
-        <Button title="Pick Audio" onPress={pickFileAndUpload} />
+        <Button title="Upload Audio" onPress={pickFileAndUpload} color="#02c39a" />
       </View>
     );
   };
