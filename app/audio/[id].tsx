@@ -40,19 +40,23 @@ export default function AudioScreen() {
         }
     }
 
+    function isPlaying(audioIndex: number) {
+        return playingSound?.index == audioIndex && playingSound.type == 'original';
+    }
+
     const Shadowing = (props: {original: AudioChunk | null, index: number}) => {
-        if (props.original == null) return
+        if (props.original == null) return;
         return (
             <View style={styles.shadowing}>
                 <Text style={styles.message}>{props.index + 1} of {originals.length}</Text>
                 <Pressable
                     style={styles.nativeSpeechBtn}
                     onPress={async () => {
-                        await playFromUri((originals[props.index] as AudioChunk).path, props.index)
+                        await playFromUri((props.original as AudioChunk).path, props.index)
                     }}
                 >
                     <Ionicons 
-                        name={playingSound?.index == props.index && playingSound.type == 'original' ? 'pause' : 'play'}
+                        name={isPlaying(props.index) ? 'pause' : 'play'}
                         size={36} 
                         color="#d3d3d3" 
                     />
