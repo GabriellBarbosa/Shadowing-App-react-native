@@ -115,16 +115,9 @@ const styles = StyleSheet.create({
         borderBottomRightRadius: 8,
         borderTopRightRadius: 8
     },
-    playAndPauseIcon: {
-        width: 24,
-        height: 24
-    },
     recordingBtnsWrapper: {
         width: 320,
         alignSelf: 'flex-end'
-    },
-    listenBtn: {
-        flex: 1,
     },
     shadowing: {
         alignItems: 'flex-start',
