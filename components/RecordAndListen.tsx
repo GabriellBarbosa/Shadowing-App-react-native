@@ -3,6 +3,7 @@ import { Audio } from "expo-av";
 import { Pressable, StyleSheet, View } from "react-native";
 import { SERVER_HOST } from "@/utils/constants";
 import { Recording } from "@/interfaces/Recording";
+import { PlayingContext } from "@/contexts/PlayingContext";
 import Ionicons from "@expo/vector-icons/Ionicons";
 
 export default function RecordAndListen(props: {
@@ -12,28 +13,26 @@ export default function RecordAndListen(props: {
     recordings: Array<Recording | null>,
     setRecordings: (arg: Array<Recording | null>) => void,
 }) {
-    const [audio, setAudio] = React.useState<Audio.Sound | undefined>(undefined);
-    const [playing, setPlaying] = React.useState<boolean>();
+    const HIGH_QUALITY_PRESET = Audio.RecordingOptionsPresets.HIGH_QUALITY;
     const [recording, setRecording] = React.useState<Audio.Recording | undefined>(undefined);
-
-    const audioPreset = Audio.RecordingOptionsPresets.HIGH_QUALITY;
+    const { playingSound, setPlayingSound } = React.useContext(PlayingContext);
 
     React.useEffect(() => {
-        if (audio)
-            updatePlayingStatus(audio);
-
-        async function updatePlayingStatus(audio: Audio.Sound) {
-            const intervalId = setInterval(async () => {
-                const status = await audio.getStatusAsync();
-                const isPlaying = status.isLoaded && status.isPlaying;
-                if (!isPlaying) {
-                    clearInterval(intervalId)
-                    setAudio(undefined);
+        if (playingSound?.type == 'rec' && playingSound?.index == props.index) {
+            const intervalID = setInterval(async () => {
+                if (await didJustFinished(playingSound.sound)) {
+                    clearInterval(intervalID)
+                    setPlayingSound(undefined);
+                    await playingSound.sound.unloadAsync();
                 }
-                setPlaying(isPlaying);
             }, 400);
         }
-    }, [audio, playing])
+    }, [playingSound])
+
+    async function didJustFinished(sound: Audio.Sound) {
+        const status = await sound.getStatusAsync();
+        return status.isLoaded && status.positionMillis == status.durationMillis;
+    }
 
     async function toggleRecording() {
         if (recording)
@@ -49,68 +48,67 @@ export default function RecordAndListen(props: {
         } catch(err) {
             setRecording(undefined);
         }
-
-        async function tryToStartRecording() {
-            const perm = await Audio.requestPermissionsAsync();
-            if (perm.status == 'granted') {
-                await Audio.setAudioModeAsync({
-                    allowsRecordingIOS: true,
-                    playsInSilentModeIOS: true
-                });
-                const { recording } = await Audio.Recording.createAsync(audioPreset);
-                return recording;
-            }
-            return undefined;
-        }
     }
     
-    async function stopRecording(recording: Audio.Recording) {
-        setRecording(undefined);
-
-        await recording.stopAndUnloadAsync();
-        await putIntoLocalRecordings();
-        const uri = recording.getURI();
-        if (uri) await saveNewRecording(uri);
-
-        async function putIntoLocalRecordings() {
-            const { sound } = await recording.createNewLoadedSoundAsync();
-            const allRecordings = [...props.recordings];
-            allRecordings[props.index] = sound;
-            props.setRecordings(allRecordings);
+    async function tryToStartRecording() {
+        const perm = await Audio.requestPermissionsAsync();
+        if (perm.status == 'granted') {
+            const audioMode = {allowsRecordingIOS: true, playsInSilentModeIOS: true};
+            await Audio.setAudioModeAsync(audioMode);
+            const { recording } = await Audio.Recording.createAsync(HIGH_QUALITY_PRESET);
+            return recording;
         }
-
-        async function saveNewRecording(recordingUri: string) {
-            const blob = await fetch(recordingUri).then(r => r.blob())
-            const b64 = await blobToBase64(blob)
-            fetch(`${SERVER_HOST}/upload_recording/${props.audioName}?chunk_name=${props.chunkName}`, {
-                method: 'POST',
-                body: JSON.stringify({ b64 }),
-                headers: { 'content-type': 'application/json' }
-            }) .catch((err) => console.error(err.message))
-        }
-
-        function blobToBase64(blob: Blob) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.onloadend = () => resolve(reader.result);
-                reader.onerror = reject;
-                reader.readAsDataURL(blob);
-            });
-        };
+        return undefined;
     }
 
+    async function stopRecording(recording: Audio.Recording) {
+        setRecording(undefined);
+        await recording.stopAndUnloadAsync();
+        await putIntoLocalRecordings(recording);
+        const uri = recording.getURI();
+        if (uri) await saveNewRecording(uri);
+    }
+    
+    async function putIntoLocalRecordings(recording: Audio.Recording) {
+        const { sound } = await recording.createNewLoadedSoundAsync();
+        const allRecordings = [...props.recordings];
+        allRecordings[props.index] = sound;
+        props.setRecordings(allRecordings);
+    }
+
+    async function saveNewRecording(recordingUri: string) {
+        const blob = await fetch(recordingUri).then(r => r.blob())
+        const b64 = await blobToBase64(blob)
+        fetch(`${SERVER_HOST}/upload_recording/${props.audioName}?chunk_name=${props.chunkName}`, {
+            method: 'POST',
+            body: JSON.stringify({ b64 }),
+            headers: { 'content-type': 'application/json' }
+        }) .catch((err) => console.error(err.message))
+    }
+
+    function blobToBase64(blob: Blob) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onloadend = () => resolve(reader.result);
+            reader.onerror = reject;
+            reader.readAsDataURL(blob);
+        });
+    };
+    
     async function playRecording(rec: Recording | null) {
-        if (rec == null) 
-            return;
-        else if (rec instanceof Audio.Sound) {
-            setAudio(rec);
-            await rec.setPositionAsync(0);
-            await rec.playAsync();
-        } else {
-            const sound = new Audio.Sound();
-            setAudio(sound);
-            await sound.loadAsync({uri: rec.path});
-            await sound.playAsync();
+        if (rec == null)  return;
+
+        if (!playingSound) {
+            if (rec instanceof Audio.Sound) {
+                setPlayingSound({ sound: rec, index: props.index, type: 'rec' });
+                await rec.setPositionAsync(0);
+                await rec.playAsync();
+            } else {
+                const sound = new Audio.Sound();
+                setPlayingSound({ sound, index: props.index, type: 'rec' });
+                await sound.loadAsync({uri: rec.path});
+                await sound.playAsync();
+            }
         }
     }
 
@@ -121,7 +119,12 @@ export default function RecordAndListen(props: {
                     <Pressable
                         style={styles.listenBtn}
                         onPress={async () => playRecording(props.recordings[props.index])}
-                    ><Ionicons name={playing ? 'pause' : 'play'} size={36} color="#d3d3d3" /></Pressable>
+                    >
+                        <Ionicons 
+                            name={playingSound?.index == props.index && playingSound.type == 'rec' ? 'pause' : 'play'} 
+                            size={36} color="#d3d3d3"
+                        />
+                    </Pressable>
                     <Pressable
                         style={styles.recordBtn}
                         onPress={async () => await toggleRecording()}
