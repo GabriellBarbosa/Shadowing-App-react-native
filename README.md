@@ -1,9 +1,8 @@
-# Practice your english speaking
+# Practice your English speaking
 
-The shadowing technique is a language learning method that involves repeating what 
-you hear in a foreign language as closely as possible.
+The shadowing technique is a language learning method that involves repeating what you hear in a foreign language as closely as possible.
 
-# How this App works
+## How this App works
 - You upload a audio (wav format).
 - The App will split the audio in sentences.
 - You can record your voice repeating what you've listened
