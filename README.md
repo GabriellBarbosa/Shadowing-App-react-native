@@ -1,4 +1,7 @@
-# Practice your speaking 🇺🇸
+# Practice your speaking <span>&U+1F1FA U+1F1F8</span>
+🇺🇸
+🇺🇸
+🇧🇷
 The shadowing technique is a language learning method that involves repeating what you hear in a foreign language as closely as possible.
 
 ## To run the App
