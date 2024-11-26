@@ -1,5 +1,4 @@
-# Practice your speaking 👋
-
+# Practice your speaking 🇺🇸
 The shadowing technique is a language learning method that involves repeating what you hear in a foreign language as closely as possible.
 
 ## To run the App
@@ -23,4 +22,4 @@ In the output, you'll find options to open the app in a
 - [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
 - [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
 
-## Remember to Run the backend
+## Remember to run the backend
