@@ -9,16 +9,20 @@ export default function HomeScreen() {
   const [audios, setAudios] = React.useState<string[]>([]);
 
   React.useEffect(() => {
-    fetch(`${SERVER_HOST}/audios`)
-      .then((res) => res.json())
-      .then((json) => setAudios(json.audios))
-      .catch((err) => console.error(err.message));
+    fetchAndSetAudios();
   }, []);
+
+  function fetchAndSetAudios() {
+    fetch(`${SERVER_HOST}/audios`)
+    .then((res) => res.json())
+    .then((json) => setAudios(json.audios))
+    .catch((err) => console.error(err.message));
+  }
 
   return (
     <View style={styles.container}>
       <View style={styles.fileUploadWrapper}>
-        <FileUploadComponent />
+        <FileUploadComponent onUploadComplete={fetchAndSetAudios} />
       </View>
       {audios.map((audioName, index) => (
         <Link 
