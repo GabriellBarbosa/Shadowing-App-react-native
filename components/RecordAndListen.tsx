@@ -121,7 +121,7 @@ export default function RecordAndListen(props: {
                 </View>
             ) : (
                 <Pressable
-                    style={styles.recordBtn}
+                    style={{...styles.recordBtn, borderBottomLeftRadius: 8, borderTopLeftRadius: 8}}
                     onPress={async () => await toggleRecording()}
                 >
                     {recording ? (
