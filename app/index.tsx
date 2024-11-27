@@ -17,7 +17,9 @@ export default function HomeScreen() {
 
   return (
     <View style={styles.container}>
-      <FileUploadComponent />
+      <View style={styles.fileUploadWrapper}>
+        <FileUploadComponent />
+      </View>
       {audios.map((audioName, index) => (
         <Link 
           key={index}
@@ -41,12 +43,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10
   },
   link: {
-    marginTop: 20,
     paddingVertical: 20,
     paddingHorizontal: 15,
-    borderTopWidth: 1,
+    borderBottomWidth: 1,
     borderColor: '#0d1b2a',
     textTransform: 'uppercase',
     color: '#fff',
+  },
+  fileUploadWrapper: {
+    marginBottom: 20
   }
 })

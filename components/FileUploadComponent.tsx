@@ -9,40 +9,47 @@ export default function FileUploadComponent() {
       const file = await pickFile();
       if (file != null)
         await uploadFile(file);
-
-      async function pickFile() {
-        try {
-          return await tryToPick();
-        } catch (err) {
-          console.error(`Error occurred on file pick: ${err}`);
-          return null;
-        }
-      }
-  
-      async function tryToPick() {
-        const result = await DocumentPicker.getDocumentAsync({
-          type: 'audio/*',
-        });
-        return result.output ? result.output[0] : null;
-      }
-  
-      async function uploadFile(file: File) {
-        try {
-          await tryToUpload(file);
-        } catch(err) {
-          console.error(`error occurred on file upload: ${err}`);
-        }
-      }
-  
-      async function tryToUpload(file: File) {
-        const data = new FormData();
-        data.append('file', file);
-        await fetch(`${SERVER_HOST}/upload`, {
-          method: 'POST',
-          body: data
-        });
-      }
     }, []);
+
+    async function pickFile() {
+      try {
+        return await tryToPick();
+      } catch (err) {
+        console.error(`Error occurred on file pick: ${err}`);
+        return null;
+      }
+    }
+
+    async function tryToPick() {
+      const result = await DocumentPicker.getDocumentAsync({
+        type: 'audio/x-wav',
+      });
+      return result.assets ? result.assets[0] : null;
+    }
+
+    async function uploadFile(file: DocumentPicker.DocumentPickerAsset) {
+      try {
+        await tryToUpload(file);
+      } catch(err) {
+        console.error(`error occurred on file upload: ${err}`);
+      }
+    }
+
+    async function tryToUpload(file: DocumentPicker.DocumentPickerAsset) {
+      await fetch(`${SERVER_HOST}/upload`, {
+        method: 'POST',
+        body: createFormData(file)
+      })
+      .then((res) => console.info(res))
+      .catch((err) => console.error(err));
+    }
+
+    function createFormData({ name, uri, mimeType }: DocumentPicker.DocumentPickerAsset) {
+      const formData = new FormData();
+      const fileData = JSON.stringify({name, uri, type: mimeType})
+      formData.append('file', JSON.parse(fileData));
+      return formData;
+    }
 
     return (
       <View>
