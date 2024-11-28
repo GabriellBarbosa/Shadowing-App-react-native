@@ -7,6 +7,9 @@ The shadowing technique is a language learning method that involves repeating wh
 - The App will split the audio in sentences.
 - You can record your voice repeating what you've listened
 
+## Example in Video
+<img src="./assets/gifs/app-intro.gif" />
+
 ## To run the App
 
 1. Install dependencies
@@ -28,4 +31,4 @@ In the output, you'll find options to open the app in a
 - [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
 - [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
 
-## Remember to run the backend
+### Remember to install and run the backend
