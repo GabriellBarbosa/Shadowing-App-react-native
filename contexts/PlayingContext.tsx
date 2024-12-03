@@ -28,9 +28,8 @@ export function PlayingProvider(props: React.PropsWithChildren) {
     async function resetPlayingSoundWhenFinished(sound: Audio.Sound) {
         const intervalId = setInterval(async () => {
             if (await didJustFinished(sound)) {
+                clearInterval(intervalId);
                 setPlayingSound(undefined);
-                clearInterval(intervalId)
-                await sound.unloadAsync();
             }
         }, 500);
     }

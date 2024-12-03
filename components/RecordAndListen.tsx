@@ -5,16 +5,20 @@ import { SERVER_HOST } from "@/utils/constants";
 import { Recording } from "@/interfaces/Recording";
 import { PlayingContext } from "@/contexts/PlayingContext";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import Slider from '@react-native-community/slider';
 
-export default function RecordAndListen(props: {
-    index: number,
-    audioName: string,
-    chunkName: string,
-    recordings: Array<Recording | null>,
-    setRecordings: (arg: Array<Recording | null>) => void,
-}) {
+interface Props {
+    index: number;
+    audioName: string;
+    chunkName: string;
+    recordings: Array<Recording | null>;
+    setRecordings: (arg: Array<Recording | null>) => void; 
+}
+
+export default function RecordAndListen(props: Props) {
     const HIGH_QUALITY_PRESET = Audio.RecordingOptionsPresets.HIGH_QUALITY;
     const [recording, setRecording] = React.useState<Audio.Recording | undefined>(undefined);
+    const [playingProgress, setPlayingProgress] = React.useState<number>(0);
     const { playingSound, setPlayingSound } = React.useContext(PlayingContext);
 
     async function toggleRecording() {
@@ -84,14 +88,21 @@ export default function RecordAndListen(props: {
         if (!playingSound) {
             if (rec instanceof Audio.Sound) {
                 setPlayingSound({ sound: rec, index: props.index, type: 'rec' });
-                await rec.setPositionAsync(0);
-                await rec.playAsync();
+                await playFromPosition(rec);
             } else {
                 const sound = new Audio.Sound();
                 setPlayingSound({ sound, index: props.index, type: 'rec' });
                 await sound.loadAsync({uri: rec.path});
-                await sound.playAsync();
+                await playFromPosition(sound);
             }
+        }
+    }
+
+    async function playFromPosition(sound: Audio.Sound) {
+        const status = await sound.getStatusAsync();
+        if (status.isLoaded) {
+            const durationMs = status.durationMillis ?? 0;
+            await sound.playFromPositionAsync(durationMs * playingProgress);
         }
     }
 
@@ -106,6 +117,16 @@ export default function RecordAndListen(props: {
                         <Ionicons 
                             name={playingSound?.index == props.index && playingSound.type == 'rec' ? 'pause' : 'play'} 
                             size={36} color="#d3d3d3"
+                        />
+                        <Slider
+                            value={playingProgress}
+                            style={{width: 200}}
+                            minimumValue={0}
+                            maximumValue={1}
+                            minimumTrackTintColor="#02c39a"
+                            maximumTrackTintColor="#212529"
+                            thumbTintColor="#02c39a"
+                            onSlidingComplete={(value) => setPlayingProgress(value)}
                         />
                     </Pressable>
                     <Pressable
@@ -143,6 +164,7 @@ const styles = StyleSheet.create({
     },
     listenBtn: {
         flex: 1,
+        flexDirection: 'row',
         backgroundColor: '#246a73',
         paddingVertical: 20,
         paddingHorizontal: 15,

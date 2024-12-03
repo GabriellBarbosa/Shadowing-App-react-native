@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "@expo/vector-icons": "^14.0.2",
+    "@react-native-community/slider": "^4.5.5",
     "@react-navigation/native": "^6.0.2",
     "@types/axios": "^0.9.36",
     "@types/react-dom": "^18.3.1",
