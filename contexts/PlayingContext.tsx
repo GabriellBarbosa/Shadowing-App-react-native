@@ -14,6 +14,8 @@ interface Props {
     progress: number;
     originalSounds: Sound[];
     setOriginalSounds: (arg: Sound[]) => void;
+    recordingSounds: Sound[];
+    setRecordingSounds: (arg: Sound[]) => void;
 }
 
 export const PlayingContext = React.createContext<Props>({
@@ -22,10 +24,13 @@ export const PlayingContext = React.createContext<Props>({
     setPlayingSound: (_arg: PlayingSound | undefined) => {},
     originalSounds: [],
     setOriginalSounds: (_arg: Sound[]) => {},
+    recordingSounds: [],
+    setRecordingSounds: (_arg: Sound[]) => {},
 });
 
 export function PlayingProvider(props: React.PropsWithChildren) {
     const [originalSounds, setOriginalSounds] = React.useState<Sound[]>([]);
+    const [recordingSounds, setRecordingSounds] = React.useState<Sound[]>([]);
 
     const [playingSound, setPlayingSound] = React.useState<PlayingSound>();
     const [progress, setProgress] = React.useState<number>(0);
@@ -77,7 +82,9 @@ export function PlayingProvider(props: React.PropsWithChildren) {
                 setPlayingSound,
                 progress,
                 originalSounds,
-                setOriginalSounds
+                setOriginalSounds,
+                recordingSounds,
+                setRecordingSounds,
             }
         }>
             {props.children}

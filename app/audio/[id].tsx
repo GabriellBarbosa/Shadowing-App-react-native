@@ -1,5 +1,4 @@
 import React from "react";
-import { Recording } from "@/interfaces/Recording";
 import { FlatList, Pressable, StyleSheet, Text, View } from "react-native";
 import { useLocalSearchParams } from "expo-router";
 import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
@@ -15,12 +14,12 @@ type RawSound = { name: string, path: string } | null;
 
 export default function AudioScreen() {
     const { id } = useLocalSearchParams();
-    const [recordings, setRecordings] = React.useState<Array<Recording | null>>([]);
     const { 
         playingSound, 
         setPlayingSound, 
         originalSounds,
-        setOriginalSounds, 
+        setOriginalSounds,
+        setRecordingSounds
     } = React.useContext(PlayingContext);
 
     React.useEffect(() => {
@@ -29,6 +28,22 @@ export default function AudioScreen() {
         .then((rawSounds) => setOriginalSounds(createSounds(rawSounds)))
         .catch((err) => console.error(err));
     }, []);
+
+    React.useEffect(() => {
+        fetch(`${SERVER_HOST}/recording/${id}`)
+        .then((res) => res.json())
+        .then((rawSounds) => setRecordingSounds(createSounds(rawSounds)))
+        .catch((err) => console.error(err));
+    }, []);
+
+    async function playFromUri(uri: string, index: number) {
+        if (!playingSound) {
+            const sound = new Audio.Sound();
+            setPlayingSound({sound, index, type: 'original'});
+            await sound.loadAsync({uri});
+            await sound.playAsync();
+        }
+    }
 
     function createSounds(arg: RawSound[]) {
         const result: Sound[] = [];
@@ -43,22 +58,6 @@ export default function AudioScreen() {
             }
         });
         return result;
-    }
-
-    React.useEffect(() => {
-        fetch(`${SERVER_HOST}/recording/${id}`)
-        .then((res) => res.json())
-        .then(async (URIs) => setRecordings(URIs))
-        .catch((err) => console.error(err));
-    }, []);
-
-    async function playFromUri(uri: string, index: number) {
-        if (!playingSound) {
-            const sound = new Audio.Sound();
-            setPlayingSound({sound, index, type: 'original'});
-            await sound.loadAsync({uri});
-            await sound.playAsync();
-        }
     }
 
     function isPlaying(audioIndex: number) {
@@ -86,8 +85,6 @@ export default function AudioScreen() {
                         index={props.index} 
                         audioName={id as string}
                         chunkName={props.original.name}
-                        recordings={recordings} 
-                        setRecordings={setRecordings}
                     />
                 </View>
             </View>

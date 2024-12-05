@@ -2,23 +2,27 @@ import React from "react";
 import { Audio } from "expo-av";
 import { Pressable, StyleSheet, View } from "react-native";
 import { SERVER_HOST } from "@/utils/constants";
-import { Recording } from "@/interfaces/Recording";
 import { PlayingContext } from "@/contexts/PlayingContext";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import ProgressBar from "./ProgressBar";
+import Sound from "@/interfaces/Sound";
 
 interface Props {
     index: number;
     audioName: string;
     chunkName: string;
-    recordings: Array<Recording | null>;
-    setRecordings: (arg: Array<Recording | null>) => void; 
 }
 
 export default function RecordAndListen(props: Props) {
     const HIGH_QUALITY_PRESET = Audio.RecordingOptionsPresets.HIGH_QUALITY;
     const [recording, setRecording] = React.useState<Audio.Recording | undefined>(undefined);
-    const {playingSound, setPlayingSound, progress} = React.useContext(PlayingContext);
+    const {
+        playingSound,
+        setPlayingSound,
+        progress,
+        setRecordingSounds,
+        recordingSounds
+    } = React.useContext(PlayingContext);
 
     async function toggleRecording() {
         if (recording)
@@ -57,9 +61,9 @@ export default function RecordAndListen(props: Props) {
     
     async function putIntoLocalRecordings(recording: Audio.Recording) {
         const { sound } = await recording.createNewLoadedSoundAsync();
-        const allRecordings = [...props.recordings];
-        allRecordings[props.index] = sound;
-        props.setRecordings(allRecordings);
+        const allRecordings = [...recordingSounds];
+        allRecordings[props.index].sound = sound;
+        setRecordingSounds(allRecordings);
     }
 
     async function saveNewRecording(recordingUri: string) {
@@ -81,17 +85,17 @@ export default function RecordAndListen(props: Props) {
         });
     };
     
-    async function playRecording(rec: Recording | null) {
+    async function playRecording(rec: Sound) {
         if (rec == null)  return;
 
         if (!playingSound) {
-            if (rec instanceof Audio.Sound) {
-                setPlayingSound({ sound: rec, index: props.index, type: 'rec' });
-                await playFromPosition(rec);
+            if (rec.sound) {
+                setPlayingSound({ sound: rec.sound, index: props.index, type: 'rec' });
+                await playFromPosition(rec.sound);
             } else {
                 const sound = new Audio.Sound();
                 setPlayingSound({ sound, index: props.index, type: 'rec' });
-                await sound.loadAsync({uri: rec.path});
+                await sound.loadAsync({uri: rec.uri});
                 await playFromPosition(sound);
             }
         }
@@ -107,12 +111,12 @@ export default function RecordAndListen(props: Props) {
 
     return (
         <View>
-            {props.recordings[props.index] ? (
+            {recordingSounds[props.index] ? (
                 <View style={styles.row}>
-                    {playingSound?.index == props.index && playingSound.type == 'rec' ? (
+                    {playingSound?.index == props.index && playingSound.type == 'rec' && recordingSounds[props.index].sound ? (
                         <Pressable
                             style={styles.listenBtn}
-                            onPress={async () => playRecording(props.recordings[props.index])}
+                            onPress={async () => playRecording(recordingSounds[props.index])}
                         >
                             <Ionicons name="pause" size={36} color="#d3d3d3" />
                             <ProgressBar value={progress} />
@@ -120,7 +124,7 @@ export default function RecordAndListen(props: Props) {
                     ) : (
                         <Pressable
                             style={styles.listenBtn}
-                            onPress={async () => playRecording(props.recordings[props.index])}
+                            onPress={async () => playRecording(recordingSounds[props.index])}
                         >
                             <Ionicons name="play" size={36} color="#d3d3d3" />
                             <ProgressBar value={0} />
