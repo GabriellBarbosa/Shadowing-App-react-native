@@ -5,7 +5,7 @@ import { SERVER_HOST } from "@/utils/constants";
 import { Recording } from "@/interfaces/Recording";
 import { PlayingContext } from "@/contexts/PlayingContext";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import Slider from '@react-native-community/slider';
+import ProgressBar from "./ProgressBar";
 
 interface Props {
     index: number;
@@ -18,8 +18,7 @@ interface Props {
 export default function RecordAndListen(props: Props) {
     const HIGH_QUALITY_PRESET = Audio.RecordingOptionsPresets.HIGH_QUALITY;
     const [recording, setRecording] = React.useState<Audio.Recording | undefined>(undefined);
-    const [playingProgress, setPlayingProgress] = React.useState<number>(0);
-    const { playingSound, setPlayingSound } = React.useContext(PlayingContext);
+    const {playingSound, setPlayingSound, progress} = React.useContext(PlayingContext);
 
     async function toggleRecording() {
         if (recording)
@@ -102,7 +101,7 @@ export default function RecordAndListen(props: Props) {
         const status = await sound.getStatusAsync();
         if (status.isLoaded) {
             const durationMs = status.durationMillis ?? 0;
-            await sound.playFromPositionAsync(durationMs * playingProgress);
+            await sound.playFromPositionAsync(durationMs * progress);
         }
     }
 
@@ -110,25 +109,24 @@ export default function RecordAndListen(props: Props) {
         <View>
             {props.recordings[props.index] ? (
                 <View style={styles.row}>
-                    <Pressable
-                        style={styles.listenBtn}
-                        onPress={async () => playRecording(props.recordings[props.index])}
-                    >
-                        <Ionicons 
-                            name={playingSound?.index == props.index && playingSound.type == 'rec' ? 'pause' : 'play'} 
-                            size={36} color="#d3d3d3"
-                        />
-                        <Slider
-                            value={playingProgress}
-                            style={{width: 200}}
-                            minimumValue={0}
-                            maximumValue={1}
-                            minimumTrackTintColor="#02c39a"
-                            maximumTrackTintColor="#212529"
-                            thumbTintColor="#02c39a"
-                            onSlidingComplete={(value) => setPlayingProgress(value)}
-                        />
-                    </Pressable>
+                    {playingSound?.index == props.index && playingSound.type == 'rec' ? (
+                        <Pressable
+                            style={styles.listenBtn}
+                            onPress={async () => playRecording(props.recordings[props.index])}
+                        >
+                            <Ionicons name="pause" size={36} color="#d3d3d3" />
+                            <ProgressBar value={progress} />
+                        </Pressable>
+                    ) : (
+                        <Pressable
+                            style={styles.listenBtn}
+                            onPress={async () => playRecording(props.recordings[props.index])}
+                        >
+                            <Ionicons name="play" size={36} color="#d3d3d3" />
+                            <ProgressBar value={0} />
+                        </Pressable>
+                    )}
+
                     <Pressable
                         style={styles.recordBtn}
                         onPress={async () => await toggleRecording()}
@@ -166,6 +164,8 @@ const styles = StyleSheet.create({
         flex: 1,
         flexDirection: 'row',
         backgroundColor: '#246a73',
+        alignItems: 'center',
+        gap: 10,
         paddingVertical: 20,
         paddingHorizontal: 15,
         borderBottomLeftRadius: 8,

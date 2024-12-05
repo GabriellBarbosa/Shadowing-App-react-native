@@ -1,5 +1,4 @@
 import React from "react";
-import AudioChunk from "@/interfaces/AudioChunk";
 import { Recording } from "@/interfaces/Recording";
 import { FlatList, Pressable, StyleSheet, Text, View } from "react-native";
 import { useLocalSearchParams } from "expo-router";
@@ -10,19 +9,41 @@ import { PlayingContext } from "@/contexts/PlayingContext";
 
 import RecordAndListen from "@/components/RecordAndListen";
 import Ionicons from '@expo/vector-icons/Ionicons';
+import Sound from "@/interfaces/Sound";
+
+type RawSound = { name: string, path: string } | null;
 
 export default function AudioScreen() {
     const { id } = useLocalSearchParams();
-    const [originals, setOriginals] = React.useState<Array<AudioChunk | null>>([]);
     const [recordings, setRecordings] = React.useState<Array<Recording | null>>([]);
-    const { playingSound, setPlayingSound } = React.useContext(PlayingContext);
+    const { 
+        playingSound, 
+        setPlayingSound, 
+        originalSounds,
+        setOriginalSounds, 
+    } = React.useContext(PlayingContext);
 
     React.useEffect(() => {
         fetch(`${SERVER_HOST}/audio/${id}`)
         .then((res) => res.json())
-        .then((URIs) => setOriginals(URIs))
+        .then((rawSounds) => setOriginalSounds(createSounds(rawSounds)))
         .catch((err) => console.error(err));
     }, []);
+
+    function createSounds(arg: RawSound[]) {
+        const result: Sound[] = [];
+        arg.forEach((rawSound) => {
+            if (rawSound) {
+                result.push({
+                    name: rawSound.name,
+                    uri: rawSound.path,
+                    sound: undefined,
+                    progress: 0
+                });
+            }
+        });
+        return result;
+    }
 
     React.useEffect(() => {
         fetch(`${SERVER_HOST}/recording/${id}`)
@@ -44,15 +65,14 @@ export default function AudioScreen() {
         return playingSound?.index == audioIndex && playingSound.type == 'original';
     }
 
-    const Shadowing = (props: {original: AudioChunk | null, index: number}) => {
-        if (props.original == null) return;
+    const Shadowing = (props: { original: Sound, index: number }) => {
         return (
             <View style={styles.shadowing}>
-                <Text style={styles.message}>{props.index + 1} of {originals.length}</Text>
+                <Text style={styles.message}>{props.index + 1} of {originalSounds.length}</Text>
                 <Pressable
                     style={styles.nativeSpeechBtn}
                     onPress={async () => {
-                        await playFromUri((props.original as AudioChunk).path, props.index)
+                        await playFromUri(props.original?.uri, props.index)
                     }}
                 >
                     <Ionicons 
@@ -78,7 +98,7 @@ export default function AudioScreen() {
         <SafeAreaProvider>
             <SafeAreaView style={styles.container}>
                 <FlatList
-                    data={originals}
+                    data={originalSounds}
                     renderItem={({item, index}) => <Shadowing original={item} index={index} />}
                     keyExtractor={(_item, index) => String(index)}
                 />
