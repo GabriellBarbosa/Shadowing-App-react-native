@@ -18,7 +18,6 @@ export default function RecordAndListen(props: Props) {
     const [recording, setRecording] = React.useState<Audio.Recording | undefined>(undefined);
     const {
         playingSound,
-        setPlayingSound,
         progress,
         setRecordingSounds,
         recordingSounds
@@ -86,18 +85,12 @@ export default function RecordAndListen(props: Props) {
     };
     
     async function playRecording(rec: Sound) {
-        if (rec == null)  return;
-
-        if (!playingSound) {
-            if (rec.sound) {
-                setPlayingSound({ sound: rec.sound, index: props.index, type: 'rec' });
-                await playFromPosition(rec.sound);
-            } else {
-                const sound = new Audio.Sound();
-                setPlayingSound({ sound, index: props.index, type: 'rec' });
-                await sound.loadAsync({uri: rec.uri});
-                await playFromPosition(sound);
-            }
+        if (rec.sound) {
+            await playFromPosition(rec.sound);
+        } else {
+            const sound = new Audio.Sound();
+            await sound.loadAsync({uri: rec.uri});
+            await playFromPosition(sound);
         }
     }
 
