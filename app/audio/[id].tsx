@@ -39,7 +39,7 @@ export default function AudioScreen() {
                     name: rawSound.name,
                     uri: rawSound.path,
                     sound: undefined,
-                    progress: 0
+                    progress: 0,
                 });
             }
         });

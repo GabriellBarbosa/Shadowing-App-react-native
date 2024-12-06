@@ -16,12 +16,7 @@ interface Props {
 export default function RecordAndListen(props: Props) {
     const HIGH_QUALITY_PRESET = Audio.RecordingOptionsPresets.HIGH_QUALITY;
     const [recording, setRecording] = React.useState<Audio.Recording | undefined>(undefined);
-    const {
-        playingSound,
-        progress,
-        setRecordingSounds,
-        recordingSounds
-    } = React.useContext(PlayingContext);
+    const { recordingSounds, setRecordingSounds, setPlayingSound } = React.useContext(PlayingContext);
 
     async function toggleRecording() {
         if (recording)
@@ -42,7 +37,7 @@ export default function RecordAndListen(props: Props) {
     async function tryToStartRecording() {
         const perm = await Audio.requestPermissionsAsync();
         if (perm.status == 'granted') {
-            const audioMode = {allowsRecordingIOS: true, playsInSilentModeIOS: true};
+            const audioMode = { allowsRecordingIOS: true, playsInSilentModeIOS: true };
             await Audio.setAudioModeAsync(audioMode);
             const { recording } = await Audio.Recording.createAsync(HIGH_QUALITY_PRESET);
             return recording;
@@ -85,34 +80,28 @@ export default function RecordAndListen(props: Props) {
     };
     
     async function playRecording(rec: Sound) {
+        let sound: Audio.Sound;
         if (rec.sound) {
-            await playFromPosition(rec.sound);
+            sound = rec.sound;
         } else {
-            const sound = new Audio.Sound();
-            await sound.loadAsync({uri: rec.uri});
-            await playFromPosition(sound);
+            const newSound = new Audio.Sound();
+            await newSound.loadAsync({uri: rec.uri});
+            sound = newSound;
         }
-    }
-
-    async function playFromPosition(sound: Audio.Sound) {
-        const status = await sound.getStatusAsync();
-        if (status.isLoaded) {
-            const durationMs = status.durationMillis ?? 0;
-            await sound.playFromPositionAsync(durationMs * progress);
-        }
+        setPlayingSound({ ...recordingSounds[props.index], sound });
     }
 
     return (
         <View>
             {recordingSounds[props.index] ? (
                 <View style={styles.row}>
-                    {playingSound?.index == props.index && playingSound.type == 'rec' && recordingSounds[props.index].sound ? (
+                    {false ? (
                         <Pressable
                             style={styles.listenBtn}
                             onPress={async () => playRecording(recordingSounds[props.index])}
                         >
                             <Ionicons name="pause" size={36} color="#d3d3d3" />
-                            <ProgressBar value={progress} />
+                            <ProgressBar value={0} />
                         </Pressable>
                     ) : (
                         <Pressable
