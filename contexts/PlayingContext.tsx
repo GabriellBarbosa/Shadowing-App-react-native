@@ -47,7 +47,7 @@ export function PlayingProvider(props: React.PropsWithChildren) {
     }
 
     function pauseLastSoundIfNecessary(lastSoundStatus: AVPlaybackStatus) {
-        if (lastSoundStatus.isLoaded && lastSoundStatus.isPlaying) {
+        if (isPlaying(lastSoundStatus)) {
             lastSound.current?.sound?.pauseAsync();
         }
     }
