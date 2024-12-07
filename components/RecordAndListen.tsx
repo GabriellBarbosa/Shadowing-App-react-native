@@ -56,7 +56,7 @@ export default function RecordAndListen(props: Props) {
     async function putIntoLocalRecordings(recording: Audio.Recording) {
         const { sound } = await recording.createNewLoadedSoundAsync();
         const allRecordings = [...recordingSounds];
-        allRecordings[props.index].sound = sound;
+        allRecordings[props.index] = { name: props.chunkName, index: props.index, sound, uri: '', progress: 0 };
         setRecordingSounds(allRecordings);
     }
 
@@ -95,24 +95,13 @@ export default function RecordAndListen(props: Props) {
         <View>
             {recordingSounds[props.index] ? (
                 <View style={styles.row}>
-                    {false ? (
-                        <Pressable
-                            style={styles.listenBtn}
-                            onPress={async () => playRecording(recordingSounds[props.index])}
-                        >
-                            <Ionicons name="pause" size={36} color="#d3d3d3" />
-                            <ProgressBar value={0} />
-                        </Pressable>
-                    ) : (
-                        <Pressable
-                            style={styles.listenBtn}
-                            onPress={async () => playRecording(recordingSounds[props.index])}
-                        >
-                            <Ionicons name="play" size={36} color="#d3d3d3" />
-                            <ProgressBar value={0} />
-                        </Pressable>
-                    )}
-
+                    <Pressable
+                        style={styles.listenBtn}
+                        onPress={async () => playRecording(recordingSounds[props.index])}
+                    >
+                        <Ionicons name="play" size={36} color="#d3d3d3" />
+                        <ProgressBar value={0} />
+                    </Pressable>
                     <Pressable
                         style={styles.recordBtn}
                         onPress={async () => await toggleRecording()}

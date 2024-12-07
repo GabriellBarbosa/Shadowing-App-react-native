@@ -41,23 +41,20 @@ export function PlayingProvider(props: React.PropsWithChildren) {
 
     function handleLastSoundPauseAndPlay() {
         lastSound.current?.sound?.getStatusAsync().then((lastSoundStatus) => {
-            pauseLastSoundIfNecessary(lastSoundStatus);
-            playSoundIfNecessary(lastSoundStatus);
+            if (isPlaying(lastSoundStatus)) {
+                lastSound.current?.sound?.pauseAsync();
+            }
+            if (shouldPlay(lastSoundStatus)) {
+                playAndSetAsLastSound();
+            }
         });
     }
 
-    function pauseLastSoundIfNecessary(lastSoundStatus: AVPlaybackStatus) {
-        if (isPlaying(lastSoundStatus)) {
-            lastSound.current?.sound?.pauseAsync();
-        }
-    }
-
-    function playSoundIfNecessary(lastSoundStatus: AVPlaybackStatus) {
-        if (isTheSame(playingSound, lastSound.current) && !isPlaying(lastSoundStatus)) {
-            playPausedSound(lastSoundStatus);
-        } else if (!isTheSame(playingSound, lastSound.current)) {
-            playAndSetAsLastSound();
-        }
+    function shouldPlay(lastSoundStatus: AVPlaybackStatus) {
+        return (
+            (isTheSame(playingSound, lastSound.current) && !isPlaying(lastSoundStatus)) ||
+            !isTheSame(playingSound, lastSound.current)
+        )
     }
 
     function isTheSame(playingSound?: Sound, lastSound?: Sound) {
@@ -68,20 +65,8 @@ export function PlayingProvider(props: React.PropsWithChildren) {
         return status.isLoaded && status.isPlaying;
     }
 
-    function playPausedSound(status: AVPlaybackStatus) {
-        if (finishedPlaying(status)) {
-            lastSound.current?.sound?.playFromPositionAsync(0);
-        } else {
-            lastSound.current?.sound?.playAsync();
-        }
-    }
-
-    function finishedPlaying(status: AVPlaybackStatus) {
-        return status.isLoaded && status.positionMillis == status.durationMillis;
-    }
-
     function playAndSetAsLastSound() {
-        playingSound?.sound?.playAsync().then(() => {
+        playingSound?.sound?.playFromPositionAsync(0).then(() => {
             lastSound.current = playingSound;
         });
     }
