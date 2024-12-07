@@ -33,9 +33,10 @@ export default function AudioScreen() {
 
     function createSounds(arg: RawSound[]) {
         const result: Sound[] = [];
-        arg.forEach((rawSound) => {
+        arg.forEach((rawSound, index) => {
             if (rawSound) {
                 result.push({
+                    index,
                     name: rawSound.name,
                     uri: rawSound.path,
                     sound: undefined,
