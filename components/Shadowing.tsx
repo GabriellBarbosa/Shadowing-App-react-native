@@ -2,6 +2,7 @@ import React from "react";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import Sound from "@/interfaces/Sound";
 import RecordAndListen from "./RecordAndListen";
+import ProgressBar from "./ProgressBar";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { PlayingContext } from "@/contexts/PlayingContext";
 import { Audio } from "expo-av";
@@ -39,6 +40,11 @@ export default function Shadowing(props: Props) {
                     size={36} 
                     color="#d3d3d3" 
                 />
+                <ProgressBar 
+                    value={originalSounds[props.index].progress}
+                    trackPositionColor="#dad7cd"
+                    backgroundColor="#495057"
+                />
             </Pressable>
             <View style={styles.recordingBtnsWrapper}>
                 <RecordAndListen
@@ -54,9 +60,12 @@ export default function Shadowing(props: Props) {
 
 const styles = StyleSheet.create({
     nativeSpeechBtn: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 10,
+        width: 294,
         marginTop: 5,
         marginBottom: 10,
-        width: 320,
         backgroundColor: '#343a40',
         paddingVertical: 20,
         paddingHorizontal: 15,

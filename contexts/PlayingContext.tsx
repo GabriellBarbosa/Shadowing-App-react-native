@@ -28,6 +28,26 @@ export function PlayingProvider(props: React.PropsWithChildren) {
     const lastSound = React.useRef<Sound>();
 
     React.useEffect(() => {
+
+        playingSound?.sound?.setOnPlaybackStatusUpdate((status) => {
+            if (status.isLoaded) {
+                const duration = status.durationMillis ?? 0;
+                let progress = status.positionMillis / duration;
+                if (playingSound.type == 'rec') {
+                    const copy = [...recordingSounds];
+                    copy[playingSound.index].progress = progress;
+                    setRecordingSounds(copy);
+                }
+                if (playingSound.type == 'original') {
+                    const copy = [...originalSounds];
+                    copy[playingSound.index].progress = progress;
+                    setOriginalSounds(copy);
+                }
+            }
+        })
+    }, [playingSound])
+
+    React.useEffect(() => {
         handlePauseAndPlay();
     }, [playingSound]);
 

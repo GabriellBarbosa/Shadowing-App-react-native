@@ -1,6 +1,6 @@
 import React from "react";
 import { Audio } from "expo-av";
-import { Pressable, StyleSheet, View } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 import { SERVER_HOST } from "@/utils/constants";
 import { PlayingContext } from "@/contexts/PlayingContext";
 import Ionicons from "@expo/vector-icons/Ionicons";
@@ -106,7 +106,11 @@ export default function RecordAndListen(props: Props) {
                         onPress={async () => playRecording(recordingSounds[props.index])}
                     >
                         <Ionicons name="play" size={36} color="#d3d3d3" />
-                        <ProgressBar value={0} />
+                        <ProgressBar 
+                            value={recordingSounds[props.index].progress}
+                            trackPositionColor="#dad7cd"
+                            backgroundColor="#40916c"
+                        />
                     </Pressable>
                     <Pressable
                         style={styles.recordBtn}
@@ -144,16 +148,16 @@ const styles = StyleSheet.create({
     listenBtn: {
         flex: 1,
         flexDirection: 'row',
-        backgroundColor: '#246a73',
         alignItems: 'center',
         gap: 10,
+        backgroundColor: '#2d6a4f',
         paddingVertical: 20,
         paddingHorizontal: 15,
         borderBottomLeftRadius: 8,
         borderTopLeftRadius: 8
     },
     recordBtn: {
-        backgroundColor: '#246a73',
+        backgroundColor: '#2d6a4f',
         paddingVertical: 20,
         paddingHorizontal: 15,
         alignSelf: 'flex-end',
