@@ -6,4 +6,5 @@ export default interface Sound {
     uri: string;
     progress: number;
     sound?: Audio.Sound;
+    type: 'rec' | 'original'
 }

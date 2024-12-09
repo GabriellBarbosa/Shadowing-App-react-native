@@ -56,7 +56,13 @@ export default function RecordAndListen(props: Props) {
     async function putIntoLocalRecordings(recording: Audio.Recording) {
         const { sound } = await recording.createNewLoadedSoundAsync();
         const allRecordings = [...recordingSounds];
-        allRecordings[props.index] = { name: props.chunkName, index: props.index, sound, uri: '', progress: 0 };
+        allRecordings[props.index] = { 
+            name: props.chunkName, 
+            index: props.index, 
+            sound, uri: '', 
+            progress: 0, 
+            type: 'rec' 
+        };
         setRecordingSounds(allRecordings);
     }
 

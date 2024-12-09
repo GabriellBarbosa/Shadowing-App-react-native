@@ -13,16 +13,16 @@ interface Props {
 }
 
 export default function Shadowing(props: Props) {
-    const { originalSounds } = React.useContext(PlayingContext);
+    const { originalSounds, setPlayingSound } = React.useContext(PlayingContext);
 
-    function isPlaying(audioIndex: number) {
-        return false;
-    }
-
-    async function playFromUri(uri: string, index: number) {
-        const sound = new Audio.Sound();
-        await sound.loadAsync({uri});
-        await sound.playAsync();
+    async function playFromUri(uri: string) {
+        if (props.original.sound) {
+            setPlayingSound({...props.original, sound: props.original.sound})
+        } else {
+            const sound = new Audio.Sound();
+            await sound.loadAsync({uri});
+            setPlayingSound({...props.original, sound})
+        }
     }
 
     return (
@@ -31,11 +31,11 @@ export default function Shadowing(props: Props) {
             <Pressable
                 style={styles.nativeSpeechBtn}
                 onPress={async () => {
-                    await playFromUri(props.original?.uri, props.index)
+                    await playFromUri(props.original?.uri)
                 }}
             >
                 <Ionicons
-                    name={isPlaying(props.index) ? 'pause' : 'play'}
+                    name="play"
                     size={36} 
                     color="#d3d3d3" 
                 />

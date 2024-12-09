@@ -20,18 +20,18 @@ export default function AudioScreen() {
     React.useEffect(() => {
         fetch(`${SERVER_HOST}/audio/${id}`)
         .then((res) => res.json())
-        .then((rawSounds) => setOriginalSounds(createSounds(rawSounds)))
+        .then((rawSounds) => setOriginalSounds(createSounds(rawSounds, 'original')))
         .catch((err) => console.error(err));
     }, []);
 
     React.useEffect(() => {
         fetch(`${SERVER_HOST}/recording/${id}`)
         .then((res) => res.json())
-        .then((rawSounds) => setRecordingSounds(createSounds(rawSounds)))
+        .then((rawSounds) => setRecordingSounds(createSounds(rawSounds, 'rec')))
         .catch((err) => console.error(err));
     }, []);
 
-    function createSounds(arg: RawSound[]) {
+    function createSounds(arg: RawSound[], type: 'rec' | 'original') {
         const result: Sound[] = [];
         arg.forEach((rawSound, index) => {
             if (rawSound) {
@@ -41,6 +41,7 @@ export default function AudioScreen() {
                     uri: rawSound.path,
                     sound: undefined,
                     progress: 0,
+                    type
                 });
             }
         });

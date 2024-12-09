@@ -58,7 +58,10 @@ export function PlayingProvider(props: React.PropsWithChildren) {
     }
 
     function isTheSame(playingSound?: Sound, lastSound?: Sound) {
-        return lastSound?.index == playingSound?.index;
+        return (
+            lastSound?.index == playingSound?.index && 
+            lastSound?.type == playingSound?.type
+        );
     }
 
     function isPlaying(status: AVPlaybackStatus) {
