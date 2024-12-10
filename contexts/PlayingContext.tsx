@@ -34,24 +34,24 @@ export function PlayingProvider(props: React.PropsWithChildren) {
 
     function handlePauseAndPlay() {
         if (lastSound.current) {
-            handleLastSoundPauseAndPlay();
+            handleLastSoundPauseAndPlayNewOne();
         } else {
-            playAndSetAsLastSound();
+            playSoundAndSetAsLastSound();
         }
     }
 
-    function handleLastSoundPauseAndPlay() {
+    function handleLastSoundPauseAndPlayNewOne() {
         lastSound.current?.sound?.getStatusAsync().then((lastSoundStatus) => {
             if (isPlaying(lastSoundStatus)) {
                 lastSound.current?.sound?.pauseAsync();
             }
-            if (shouldPlay(lastSoundStatus)) {
-                playAndSetAsLastSound();
+            if (shouldPlayNewSound(lastSoundStatus)) {
+                playSoundAndSetAsLastSound();
             }
         });
     }
 
-    function shouldPlay(lastSoundStatus: AVPlaybackStatus) {
+    function shouldPlayNewSound(lastSoundStatus: AVPlaybackStatus) {
         return (
             (isEqual(playingSound, lastSound.current) && !isPlaying(lastSoundStatus)) ||
             !isEqual(playingSound, lastSound.current)
@@ -69,7 +69,7 @@ export function PlayingProvider(props: React.PropsWithChildren) {
         return status.isLoaded && status.isPlaying;
     }
 
-    function playAndSetAsLastSound() {
+    function playSoundAndSetAsLastSound() {
         playingSound?.sound?.playFromPositionAsync(0).then(() => {
             lastSound.current = playingSound;
         });
