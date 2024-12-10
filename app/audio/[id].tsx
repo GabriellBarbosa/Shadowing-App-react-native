@@ -14,8 +14,13 @@ export default function AudioScreen() {
     const { 
         originalSounds,
         setOriginalSounds,
-        setRecordingSounds
+        setRecordingSounds,
+        reset
     } = React.useContext(PlayingContext);
+
+    React.useEffect(() => {
+        return () => reset();
+    }, [])
 
     React.useEffect(() => {
         fetch(`${SERVER_HOST}/audio/${id}`)

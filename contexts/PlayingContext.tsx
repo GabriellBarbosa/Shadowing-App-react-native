@@ -9,6 +9,7 @@ interface Props {
     setOriginalSounds: (arg: Sound[]) => void;
     setRecordingSounds: (arg: Sound[]) => void;
     setPlayingSound: (arg: Sound) => void;
+    reset: () => void;
 }
 
 export const PlayingContext = React.createContext<Props>({
@@ -18,6 +19,7 @@ export const PlayingContext = React.createContext<Props>({
     setOriginalSounds: (_arg: Sound[]) => {},
     setRecordingSounds: (_arg: Sound[]) => {},
     setPlayingSound: (_arg: Sound) => {},
+    reset: () => {}
 });
 
 export function PlayingProvider(props: React.PropsWithChildren) {
@@ -115,6 +117,15 @@ export function PlayingProvider(props: React.PropsWithChildren) {
         }  
     }
 
+    async function reset() {
+        await playingSound?.sound?.stopAsync();
+        await lastSound.current?.sound?.stopAsync();
+        lastSound.current = undefined;
+        setPlayingSound(undefined);
+        setOriginalSounds([]);
+        setRecordingSounds([]);
+    }
+
     return (
         <PlayingContext.Provider 
             value={{
@@ -123,7 +134,8 @@ export function PlayingProvider(props: React.PropsWithChildren) {
                 playingSound,
                 setOriginalSounds,
                 setRecordingSounds,
-                setPlayingSound
+                setPlayingSound,
+                reset
             }
         }>
             {props.children}
