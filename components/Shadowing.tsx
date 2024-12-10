@@ -36,13 +36,13 @@ export default function Shadowing(props: Props) {
                 }}
             >
                 <Ionicons
-                    name={originalSounds[props.index].isPlaying ? 'pause-outline' : 'play-outline'}
+                    name={originalSounds[props.index].isPlaying ? 'pause' : 'play'}
                     size={36} 
                     color="#ccc" 
                 />
                 <ProgressBar 
                     value={originalSounds[props.index].progress}
-                    trackPositionColor="#dad7cd"
+                    trackPositionColor="#C2C2C2"
                     backgroundColor="#495057"
                 />
             </Pressable>
@@ -62,7 +62,7 @@ const styles = StyleSheet.create({
     nativeSpeechBtn: {
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 10,
+        gap: 15,
         width: 294,
         marginTop: 5,
         marginBottom: 10,
