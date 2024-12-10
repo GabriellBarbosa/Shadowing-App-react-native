@@ -37,11 +37,12 @@ export default function AudioScreen() {
             if (rawSound) {
                 result.push({
                     index,
+                    type,
                     name: rawSound.name,
                     uri: rawSound.path,
                     sound: undefined,
                     progress: 0,
-                    type
+                    isPlaying: false
                 });
             }
         });

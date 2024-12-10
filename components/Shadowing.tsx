@@ -36,7 +36,7 @@ export default function Shadowing(props: Props) {
                 }}
             >
                 <Ionicons
-                    name="play"
+                    name={originalSounds[props.index].isPlaying ? 'pause' : 'play'}
                     size={36} 
                     color="#d3d3d3" 
                 />
@@ -82,7 +82,7 @@ const styles = StyleSheet.create({
     message: {
         marginTop: 10,
         padding: 10,
-        color: '#c3c3c3',
+        color: '#d3d3d3',
         backgroundColor: '#343a40',
         borderBottomRightRadius: 8,
         borderTopRightRadius: 8

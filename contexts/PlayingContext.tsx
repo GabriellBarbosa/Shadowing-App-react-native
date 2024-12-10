@@ -18,7 +18,6 @@ export const PlayingContext = React.createContext<Props>({
     setOriginalSounds: (_arg: Sound[]) => {},
     setRecordingSounds: (_arg: Sound[]) => {},
     setPlayingSound: (_arg: Sound) => {},
-
 });
 
 export function PlayingProvider(props: React.PropsWithChildren) {
@@ -29,7 +28,7 @@ export function PlayingProvider(props: React.PropsWithChildren) {
 
     React.useEffect(() => {
         handlePauseAndPlay();
-        handleSoundProgress();
+        handleSoundStatus();
     }, [playingSound]);
 
     function handlePauseAndPlay() {
@@ -75,11 +74,12 @@ export function PlayingProvider(props: React.PropsWithChildren) {
         });
     }
 
-    function handleSoundProgress() {
+    function handleSoundStatus() {
         playingSound?.sound?.setOnPlaybackStatusUpdate((status) => {
             if (status.isLoaded) {
                 let progress = calcProgress(status);
                 updateProgress(playingSound, progress);
+                updatePlayingState(playingSound, status)
             }
         })
     }
@@ -100,6 +100,19 @@ export function PlayingProvider(props: React.PropsWithChildren) {
             originalsCopy[playingSound.index].progress = progress;
             setOriginalSounds(originalsCopy);
         }
+    }
+
+    function updatePlayingState(playingSound: Sound, status: AVPlaybackStatus) {
+        if (playingSound.type == 'rec') {
+            const recordingsCopy = [...recordingSounds];
+            recordingsCopy[playingSound.index].isPlaying = isPlaying(status);
+            setRecordingSounds(recordingsCopy);
+        }
+        if (playingSound.type == 'original') {
+            const originalsCopy = [...originalSounds];
+            originalsCopy[playingSound.index].isPlaying = isPlaying(status);
+            setOriginalSounds(originalsCopy);
+        }  
     }
 
     return (

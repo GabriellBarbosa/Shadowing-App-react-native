@@ -61,7 +61,8 @@ export default function RecordAndListen(props: Props) {
             index: props.index, 
             sound, uri: '', 
             progress: 0, 
-            type: 'rec' 
+            type: 'rec',
+            isPlaying: false
         };
         setRecordingSounds(allRecordings);
     }
@@ -105,7 +106,11 @@ export default function RecordAndListen(props: Props) {
                         style={styles.listenBtn}
                         onPress={async () => playRecording(recordingSounds[props.index])}
                     >
-                        <Ionicons name="play" size={36} color="#d3d3d3" />
+                        <Ionicons 
+                            name={recordingSounds[props.index].isPlaying ? 'pause' : 'play'} 
+                            size={36} 
+                            color="#d3d3d3" 
+                        />
                         <ProgressBar 
                             value={recordingSounds[props.index].progress}
                             trackPositionColor="#dad7cd"
