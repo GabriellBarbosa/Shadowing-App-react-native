@@ -36,9 +36,9 @@ export default function Shadowing(props: Props) {
                 }}
             >
                 <Ionicons
-                    name={originalSounds[props.index].isPlaying ? 'pause' : 'play'}
+                    name={originalSounds[props.index].isPlaying ? 'pause-outline' : 'play-outline'}
                     size={36} 
-                    color="#d3d3d3" 
+                    color="#ccc" 
                 />
                 <ProgressBar 
                     value={originalSounds[props.index].progress}
@@ -82,7 +82,7 @@ const styles = StyleSheet.create({
     message: {
         marginTop: 10,
         padding: 10,
-        color: '#d3d3d3',
+        color: '#ccc',
         backgroundColor: '#343a40',
         borderBottomRightRadius: 8,
         borderTopRightRadius: 8

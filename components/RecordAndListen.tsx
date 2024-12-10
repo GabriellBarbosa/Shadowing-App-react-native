@@ -107,9 +107,9 @@ export default function RecordAndListen(props: Props) {
                         onPress={async () => playRecording(recordingSounds[props.index])}
                     >
                         <Ionicons 
-                            name={recordingSounds[props.index].isPlaying ? 'pause' : 'play'} 
+                            name={recordingSounds[props.index].isPlaying ? 'pause-outline' : 'play-outline'} 
                             size={36} 
-                            color="#d3d3d3" 
+                            color="#ccc" 
                         />
                         <ProgressBar 
                             value={recordingSounds[props.index].progress}
@@ -122,9 +122,9 @@ export default function RecordAndListen(props: Props) {
                         onPress={async () => await toggleRecording()}
                     >
                         {recording ? (
-                            <Ionicons name="radio-button-on" size={36} color="#ff5a5f" />
+                            <Ionicons name="radio-button-on-outline" size={36} color="#ff5a5f" />
                         ) : (
-                            <Ionicons name="mic" size={36} color="#d3d3d3" />
+                            <Ionicons name="mic-outline" size={36} color="#ccc" />
                         )}
                     </Pressable>
                 </View>
@@ -136,7 +136,7 @@ export default function RecordAndListen(props: Props) {
                     {recording ? (
                         <Ionicons name="radio-button-on" size={36} color="#ff5a5f" />
                     ) : (
-                        <Ionicons name="mic" size={36} color="#d3d3d3" />
+                        <Ionicons name="mic-outline" size={36} color="#ccc" />
                     )}
                 </Pressable>
             )}
