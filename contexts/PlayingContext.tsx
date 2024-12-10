@@ -1,6 +1,6 @@
 import React from "react";
 import Sound from "@/interfaces/Sound";
-import { AVPlaybackStatus } from "expo-av";
+import { AVPlaybackStatus, AVPlaybackStatusSuccess } from "expo-av";
 
 interface Props {
     originalSounds: Sound[];
@@ -28,27 +28,8 @@ export function PlayingProvider(props: React.PropsWithChildren) {
     const lastSound = React.useRef<Sound>();
 
     React.useEffect(() => {
-
-        playingSound?.sound?.setOnPlaybackStatusUpdate((status) => {
-            if (status.isLoaded) {
-                const duration = status.durationMillis ?? 0;
-                let progress = status.positionMillis / duration;
-                if (playingSound.type == 'rec') {
-                    const copy = [...recordingSounds];
-                    copy[playingSound.index].progress = progress;
-                    setRecordingSounds(copy);
-                }
-                if (playingSound.type == 'original') {
-                    const copy = [...originalSounds];
-                    copy[playingSound.index].progress = progress;
-                    setOriginalSounds(copy);
-                }
-            }
-        })
-    }, [playingSound])
-
-    React.useEffect(() => {
         handlePauseAndPlay();
+        handleSoundProgress();
     }, [playingSound]);
 
     function handlePauseAndPlay() {
@@ -72,12 +53,12 @@ export function PlayingProvider(props: React.PropsWithChildren) {
 
     function shouldPlay(lastSoundStatus: AVPlaybackStatus) {
         return (
-            (isTheSame(playingSound, lastSound.current) && !isPlaying(lastSoundStatus)) ||
-            !isTheSame(playingSound, lastSound.current)
+            (isEqual(playingSound, lastSound.current) && !isPlaying(lastSoundStatus)) ||
+            !isEqual(playingSound, lastSound.current)
         )
     }
 
-    function isTheSame(playingSound?: Sound, lastSound?: Sound) {
+    function isEqual(playingSound?: Sound, lastSound?: Sound) {
         return (
             lastSound?.index == playingSound?.index && 
             lastSound?.type == playingSound?.type
@@ -92,6 +73,33 @@ export function PlayingProvider(props: React.PropsWithChildren) {
         playingSound?.sound?.playFromPositionAsync(0).then(() => {
             lastSound.current = playingSound;
         });
+    }
+
+    function handleSoundProgress() {
+        playingSound?.sound?.setOnPlaybackStatusUpdate((status) => {
+            if (status.isLoaded) {
+                let progress = calcProgress(status);
+                updateProgress(playingSound, progress);
+            }
+        })
+    }
+
+    function calcProgress(status: AVPlaybackStatusSuccess) {
+        const duration = status.durationMillis ?? 0;
+        return status.positionMillis / duration;
+    }
+
+    function updateProgress(playingSound: Sound, progress: number) {
+        if (playingSound.type == 'rec') {
+            const recordingsCopy = [...recordingSounds];
+            recordingsCopy[playingSound.index].progress = progress;
+            setRecordingSounds(recordingsCopy);
+        }
+        if (playingSound.type == 'original') {
+            const originalsCopy = [...originalSounds];
+            originalsCopy[playingSound.index].progress = progress;
+            setOriginalSounds(originalsCopy);
+        }
     }
 
     return (
