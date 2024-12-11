@@ -70,10 +70,28 @@ export function PlayingProvider(props: React.PropsWithChildren) {
         return status.isLoaded && status.isPlaying;
     }
 
-    function playSoundAndSetAsLastSound() {
-        playingSound?.sound?.playFromPositionAsync(0).then(() => {
+    async function playSoundAndSetAsLastSound() {
+        const position = await getPlayPosition();
+        playingSound?.sound?.playFromPositionAsync(position).then(() => {
             lastSound.current = playingSound;
         });
+    }
+
+    async function getPlayPosition() {
+        let position = 0;
+        if (playingSound) {
+            const progress = playingSound.progress;
+            if (progress == 1) {
+                position = 0;
+            } else {
+                const status = await playingSound.sound?.getStatusAsync();
+                if (status?.isLoaded) {
+                    const duration = status.durationMillis ?? 0;
+                    position = duration * progress;
+                }
+            }
+        }
+        return position;
     }
 
     function handleSoundStatus() {
