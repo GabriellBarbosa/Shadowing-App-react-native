@@ -36,14 +36,9 @@ export default function Shadowing(props: Props) {
                 }}
             >
                 <Ionicons
-                    name={originalSounds[props.index].isPlaying ? 'pause' : 'play'}
+                    name={originalSounds[props.index].isPlaying ? 'pause-circle' : 'play-circle'}
                     size={36} 
                     color="#ccc" 
-                />
-                <ProgressBar 
-                    value={originalSounds[props.index].progress}
-                    trackPositionColor="#C2C2C2"
-                    backgroundColor="#495057"
                 />
             </Pressable>
             <View style={styles.recordingBtnsWrapper}>
@@ -61,9 +56,9 @@ export default function Shadowing(props: Props) {
 const styles = StyleSheet.create({
     nativeSpeechBtn: {
         flexDirection: 'row',
-        alignItems: 'center',
+        justifyContent: 'center',
         gap: 15,
-        width: 294,
+        width: 220,
         marginTop: 5,
         marginBottom: 10,
         backgroundColor: '#343a40',
@@ -73,7 +68,7 @@ const styles = StyleSheet.create({
         borderTopRightRadius: 8
     },
     recordingBtnsWrapper: {
-        width: 320,
+        width: 260,
         alignSelf: 'flex-end'
     },
     shadowing: {

@@ -1,6 +1,6 @@
 import React from "react";
 import Sound from "@/interfaces/Sound";
-import { AVPlaybackStatus, AVPlaybackStatusSuccess } from "expo-av";
+import { AVPlaybackStatus } from "expo-av";
 
 interface Props {
     originalSounds: Sound[];
@@ -30,20 +30,20 @@ export function PlayingProvider(props: React.PropsWithChildren) {
 
     React.useEffect(() => {
         handlePauseAndPlay();
-        handleSoundStatus();
+        handlePlayingStatus();
     }, [playingSound]);
 
     function handlePauseAndPlay() {
         if (lastSound.current) {
-            handleLastSoundPauseAndPlayNewOne();
+            handleLastSoundPauseAndPlay();
         } else {
             playSoundAndSetAsLastSound();
         }
     }
 
-    function handleLastSoundPauseAndPlayNewOne() {
+    function handleLastSoundPauseAndPlay() {
         lastSound.current?.sound?.getStatusAsync().then((lastSoundStatus) => {
-            if (isPlaying(lastSoundStatus)) {
+            if (isPlaying(lastSoundStatus) && !isEqual(playingSound, lastSound.current)) {
                 lastSound.current?.sound?.pauseAsync();
             }
             if (shouldPlayNewSound(lastSoundStatus)) {
@@ -71,55 +71,17 @@ export function PlayingProvider(props: React.PropsWithChildren) {
     }
 
     async function playSoundAndSetAsLastSound() {
-        const position = await getPlayPosition();
-        playingSound?.sound?.playFromPositionAsync(position).then(() => {
+        playingSound?.sound?.playAsync().then(() => {
             lastSound.current = playingSound;
         });
     }
 
-    async function getPlayPosition() {
-        let position = 0;
-        if (playingSound) {
-            const progress = playingSound.progress;
-            if (progress == 1) {
-                position = 0;
-            } else {
-                const status = await playingSound.sound?.getStatusAsync();
-                if (status?.isLoaded) {
-                    const duration = status.durationMillis ?? 0;
-                    position = duration * progress;
-                }
-            }
-        }
-        return position;
-    }
-
-    function handleSoundStatus() {
+    function handlePlayingStatus() {
         playingSound?.sound?.setOnPlaybackStatusUpdate((status) => {
             if (status.isLoaded) {
-                let progress = calcProgress(status);
-                updateProgress(playingSound, progress);
                 updatePlayingState(playingSound, status)
             }
         })
-    }
-
-    function calcProgress(status: AVPlaybackStatusSuccess) {
-        const duration = status.durationMillis ?? 0;
-        return status.positionMillis / duration;
-    }
-
-    function updateProgress(playingSound: Sound, progress: number) {
-        if (playingSound.type == 'rec') {
-            const recordingsCopy = [...recordingSounds];
-            recordingsCopy[playingSound.index].progress = progress;
-            setRecordingSounds(recordingsCopy);
-        }
-        if (playingSound.type == 'original') {
-            const originalsCopy = [...originalSounds];
-            originalsCopy[playingSound.index].progress = progress;
-            setOriginalSounds(originalsCopy);
-        }
     }
 
     function updatePlayingState(playingSound: Sound, status: AVPlaybackStatus) {

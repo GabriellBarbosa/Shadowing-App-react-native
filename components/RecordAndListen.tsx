@@ -4,7 +4,6 @@ import { Pressable, StyleSheet, Text, View } from "react-native";
 import { SERVER_HOST } from "@/utils/constants";
 import { PlayingContext } from "@/contexts/PlayingContext";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import ProgressBar from "./ProgressBar";
 import Sound from "@/interfaces/Sound";
 
 interface Props {
@@ -60,7 +59,6 @@ export default function RecordAndListen(props: Props) {
             name: props.chunkName, 
             index: props.index, 
             sound, uri: '', 
-            progress: 0, 
             type: 'rec',
             isPlaying: false
         };
@@ -107,14 +105,9 @@ export default function RecordAndListen(props: Props) {
                         onPress={async () => playRecording(recordingSounds[props.index])}
                     >
                         <Ionicons 
-                            name={recordingSounds[props.index].isPlaying ? 'pause' : 'play'} 
+                            name={recordingSounds[props.index].isPlaying ? 'pause-circle' : 'play-circle'} 
                             size={36} 
                             color="#ccc" 
-                        />
-                        <ProgressBar 
-                            value={recordingSounds[props.index].progress}
-                            trackPositionColor="#C2C2C2"
-                            backgroundColor="#40916c"
                         />
                     </Pressable>
                     <Pressable
@@ -153,7 +146,7 @@ const styles = StyleSheet.create({
     listenBtn: {
         flex: 1,
         flexDirection: 'row',
-        alignItems: 'center',
+        justifyContent: 'center',
         gap: 15,
         backgroundColor: '#2d6a4f',
         paddingVertical: 20,
