@@ -1,11 +1,10 @@
-# Practice your English speaking
-
+# Shadowing App
 The shadowing technique is a language learning method that involves repeating what you hear in a foreign language as closely as possible.
 
-## This is how the App works
-- You upload an audio of a native speaker (wav format pls).
+## How this App works
+- Paste a YouTube video URL and click in Download.
 - The App will split the audio into sentences.
-- Record your voice repeating what you've heard.
+- Record your voice repeating what you've heard as closely as possible.
 
 ## Example
 <img src="./assets/gifs/app-intro.gif" />
