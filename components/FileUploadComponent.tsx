@@ -1,5 +1,5 @@
-import React, { useCallback } from 'react';
-import { Button, View, TextInput, StyleSheet, Text } from 'react-native';
+import React from 'react';
+import { Button, View, TextInput, StyleSheet } from 'react-native';
 import { SERVER_HOST } from '@/utils/constants';
 
 interface Props {
