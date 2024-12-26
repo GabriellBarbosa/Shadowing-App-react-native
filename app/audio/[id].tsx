@@ -11,32 +11,37 @@ type RawSound = { name: string, path: string } | null;
 
 export default function AudioScreen() {
     const { id } = useLocalSearchParams();
-    const { 
-        originalSounds,
-        setOriginalSounds,
-        setRecordingSounds,
-        reset
+    const {
+        originalSounds, 
+        setOriginalSounds, 
+        setRecordingSounds, 
+        resetPlayingContext
     } = React.useContext(PlayingContext);
 
     React.useEffect(() => {
-        return () => reset();
-    }, [])
+        getAndSetOriginalAudios();
+        getAndSetRecordings();
 
-    React.useEffect(() => {
+        return () => {
+            resetPlayingContext();
+        }
+    }, []);
+
+    const getAndSetOriginalAudios = React.useCallback(() => {
         fetch(`${SERVER_HOST}/audio/${id}`)
         .then((res) => res.json())
         .then((rawSounds) => setOriginalSounds(createSounds(rawSounds, 'original')))
         .catch((err) => console.error(err));
     }, []);
 
-    React.useEffect(() => {
+    const getAndSetRecordings = React.useCallback(() => {
         fetch(`${SERVER_HOST}/recording/${id}`)
         .then((res) => res.json())
         .then((rawSounds) => setRecordingSounds(createSounds(rawSounds, 'rec')))
         .catch((err) => console.error(err));
     }, []);
 
-    function createSounds(arg: RawSound[], type: 'rec' | 'original') {
+    const createSounds = React.useCallback((arg: RawSound[], type: 'rec' | 'original') => {
         const result: Sound[] = [];
         arg.forEach((rawSound, index) => {
             if (rawSound) {
@@ -46,13 +51,12 @@ export default function AudioScreen() {
                     name: rawSound.name,
                     uri: rawSound.path,
                     sound: undefined,
-                    progress: 0,
                     isPlaying: false
                 });
             }
         });
         return result;
-    }
+    }, []);
 
     return (
         <SafeAreaProvider>
