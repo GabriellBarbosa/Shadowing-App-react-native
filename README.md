@@ -25,6 +25,6 @@ In the output, you'll find options to open the app in a
 - [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
 
 ### Remember to clone and run the back-end
-- [Shadowing-App-python-backend](https://github.com/GabriellBarbosa/Shadowing-App-python-backend)
+- [Shadowing-App-python](https://github.com/GabriellBarbosa/Shadowing-App-python)
 
 When you're using the App make sure that you are connected to the same internet connection as the server.
